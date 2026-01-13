@@ -60,7 +60,7 @@ def get_job_templates(hierarchy_id: str, is_enabled: bool = True) -> str:
             })
 
         # CACHE THE RESULT
-        cache_tool_result("templates", result)
+        cache_tool_result(result)
 
         return json.dumps({"templates": result})
     except Exception as e:

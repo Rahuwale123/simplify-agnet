@@ -53,7 +53,7 @@ def get_hierarchies(job_manager_id: str) -> str:
         parse_hierarchies(common_hierarchies)
         
         # CACHE THE RESULT
-        cache_tool_result("hierarchies", result)
+        cache_tool_result(result)
 
         return json.dumps({"hierarchies": result})
     except Exception as e:

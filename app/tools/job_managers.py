@@ -50,7 +50,7 @@ def get_job_managers(page: int = 1, limit: int = 25) -> str:
             })
 
         # CACHE THE RESULT for 'get_last_search'
-        cache_tool_result("managers", result)
+        cache_tool_result(result)
 
         return json.dumps({"managers": result})
     except Exception as e:

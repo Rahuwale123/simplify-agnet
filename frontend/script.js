@@ -1,6 +1,6 @@
 // Configuration Management - Defaulting to test session details
 let config = {
-    token: "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJMTl81cm1HcHNlUHpOemQ3YzlON0tGbHhYUWlCVE0xdlkzUHpIUlBVLUk0In0.eyJleHAiOjE3NjgzNDAzMDgsImlhdCI6MTc2ODMwNDMwOCwianRpIjoiY2U0MTUzZWUtMzYzNy00NGQwLWI3ZmYtNjYyZjIyZWNhYjc0IiwiaXNzIjoiaHR0cHM6Ly92NC1ub25wcm9kLWF1dGguc2ltcGxpZnlzYW5kYm94Lm5ldC9yZWFsbXMvcWEtaGVhbHRoY2FyZSIsImF1ZCI6WyJyZWFsbS1tYW5hZ2VtZW50IiwiYWNjb3VudCJdLCJzdWIiOiIwMTUwNGM3OC1mNTFmLTRiYzYtOTI3Zi03YjcxMmEyNDA0YzAiLCJ0eXAiOiJCZWFyZXIiLCJhenAiOiJzaW1wbGlmeS1hdXRoLXNlcnZpY2UiLCJzaWQiOiIzYWU4ZGIxNC0yZmNjLTQ3ZWYtYmFlNC0zNmNlMjBkZWIzYjkiLCJhY3IiOiIxIiwicmVhbG1fYWNjZXNzIjp7InJvbGVzIjpbIm9mZmxpbmVfYWNjZXNzIiwidW1hX2F1dGhvcml6YXRpb24iLCJkZWZhdWx0LXJvbGVzLXFhLWhlYWx0aGNhcmUiXX0sInJlc291cmNlX2FjY2VzcyI6eyJyZWFsbS1tYW5hZ2VtZW50Ijp7InJvbGVzIjpbInZpZXctdXNlcnMiLCJxdWVyeS1ncm91cHMiLCJxdWVyeS11c2VycyJdfSwiYWNjb3VudCI6eyJyb2xlcyI6WyJtYW5hZ2UtYWNjb3VudCIsIm1hbmFnZS1hY2NvdW50LWxpbmtzIiwidmlldy1wcm9maWxlIl19fSwic2NvcGUiOiJzaW1wbGlmeS1hdXRoIGVtYWlsIHByb2ZpbGUiLCJlbWFpbF92ZXJpZmllZCI6ZmFsc2UsInByZWZlcnJlcl91c2VybmFtZSI6InNpZGRodWdhZGFraDU3NitkZXdpZDAxQGdtYWlsLmNvbSIsImNsaWVudF90eXBlIjoiaW50ZXJuYWwiLCJwcmVmZXJyZWRfdXNlcm5hbWUiOiJzaWRkaHVnYWRha2g1NzYrZGV3aWQwMUBnbWFpbC5jb20ifQ.W29dzAqozlFwbgRi_kOmbWQsxZKoBbNHSnlBLh8Hyec2tITsnS8nD2L31J6x4qkM8vgSpaLNA4si37i48v_jNJuWi36-HE2ZbqfLZuuWv4vKfyLt_YxFiM78ylVJv3iS2bpxy7_x8OTxLb4JYZxRXXGdPyGZUaGfiywwM29enmQ__2_IVN6NSUeaN4b0U8dGuEjnI4KDA9YQMrlOP3nW0KqMyFD_PqZ60GEx71jPTSzqX_vyKxMH5ybvRpsX5EGMg3lNUfjhGwgTVSEdD9p79wXeIj7i2po5jebTO7Dl4sE_CjtixYcozoVHyTfMa1jIk9vY8dIyoGzUMm7wJ5k7MQ",
+    token: "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJMTl81cm1HcHNlUHpOemQ3YzlON0tGbHhYUWlCVE0xdlkzUHpIUlBVLUk0In0.eyJleHAiOjE3NjgzNTc2MTAsImlhdCI6MTc2ODMyMTYxMCwianRpIjoiMmI2YTFkNGItMjBiYS00OWNhLTgwNWItZmVjODRjOTA4MjkzIiwiaXNzIjoiaHR0cHM6Ly92NC1ub25wcm9kLWF1dGguc2ltcGxpZnlzYW5kYm94Lm5ldC9yZWFsbXMvcWEtaGVhbHRoY2FyZSIsImF1ZCI6WyJyZWFsbS1tYW5hZ2VtZW50IiwiYWNjb3VudCJdLCJzdWIiOiIwMTUwNGM3OC1mNTFmLTRiYzYtOTI3Zi03YjcxMmEyNDA0YzAiLCJ0eXAiOiJCZWFyZXIiLCJhenAiOiJzaW1wbGlmeS1hdXRoLXNlcnZpY2UiLCJzaWQiOiIyZWY5MmMyMy1jM2VmLTQzMjktOWRkZS0zYTM0YzQ4OTZkNzciLCJhY3IiOiIxIiwicmVhbG1fYWNjZXNzIjp7InJvbGVzIjpbIm9mZmxpbmVfYWNjZXNzIiwidW1hX2F1dGhvcml6YXRpb24iLCJkZWZhdWx0LXJvbGVzLXFhLWhlYWx0aGNhcmUiXX0sInJlc291cmNlX2FjY2VzcyI6eyJyZWFsbS1tYW5hZ2VtZW50Ijp7InJvbGVzIjpbInZpZXctdXNlcnMiLCJxdWVyeS1ncm91cHMiLCJxdWVyeS11c2VycyJdfSwiYWNjb3VudCI6eyJyb2xlcyI6WyJtYW5hZ2UtYWNjb3VudCIsIm1hbmFnZS1hY2NvdW50LWxpbmtzIiwidmlldy1wcm9maWxlIl19fSwic2NvcGUiOiJzaW1wbGlmeS1hdXRoIGVtYWlsIHByb2ZpbGUiLCJlbWFpbF92ZXJpZmllZCI6ZmFsc2UsInByZWZlcnJlcl91c2VybmFtZSI6InNpZGRodWdhZGFraDU3NitkZXdpZDAxQGdtYWlsLmNvbSIsImNsaWVudF90eXBlIjoiaW50ZXJuYWwiLCJwcmVmZXJyZWRfdXNlcm5hbWUiOiJzaWRkaHVnYWRha2g1NzYrZGV3aWQwMUBnbWFpbC5jb20ifQ.nrv8d4l_L1Cl2rA_p6pifPPdyu1hlOPjKfdVjhS3cA84hYAf26sj3mr8oXMk9HtYLEKk4b9xbg4GU3lkiqKGwPnMcNski_QqElu9KMh0zA_cTY0vQffR675OThgb1vuD9uD_YcuP1AERnPCmQXDAG_BaiZVHaXJoE6YDUpmhW-Ci6_teEiHskRxhJEb7yydXmm5x1KBObvAbKWIX3dLKU8YvpdsqKo19LMNPnwYCU_4vFaN7gyIU8KTWQMMP1goyvhITAcPKeUa12dnQfH-YxN1Qu7OVJTlfxMHWYT8aQZG1FTJJcxzSjHkaKhTncAift7jrvkigRdQomnjhFuic7Q",
     programId: "388d51a8-6416-4852-83ec-d040b7b11518",
     userId: "user-456"
 };
@@ -165,7 +165,30 @@ newChatBtn.onclick = (e) => {
 function formatContent(content) {
     if (!content) return '';
 
-    // Check if the content is a JSON Summary (sent when workflow is complete)
+    // Check for JSON with ui_action (sent by submit_job tool)
+    // We look for the string "ui_action" and then attempt to parse the widest possible JSON block
+    if (content.includes('ui_action') && content.includes('show_completion_buttons')) {
+        try {
+            const firstBrace = content.indexOf('{');
+            const lastBrace = content.lastIndexOf('}');
+
+            if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
+                const potentialJson = content.substring(firstBrace, lastBrace + 1);
+                const data = JSON.parse(potentialJson);
+
+                if (data.ui_action === "show_completion_buttons" && data.draft_data) {
+                    // Replace the JSON part with the rendered summary, keeping any preceding text
+                    const textBefore = content.substring(0, firstBrace);
+                    const textAfter = content.substring(lastBrace + 1);
+                    return formatContent(textBefore) + renderSummary(data.draft_data) + formatContent(textAfter);
+                }
+            }
+        } catch (e) {
+            console.error("JSON parse error in summary detection", e);
+        }
+    }
+
+    // Check if the content is a JSON Summary (legacy fallback)
     if (content.includes('```json') && content.includes('"job_title"')) {
         try {
             const jsonStr = content.match(/```json\n([\s\S]*?)\n```/)[1];
@@ -203,25 +226,11 @@ function formatContent(content) {
 }
 
 function renderSummary(data) {
-    let fieldsHtml = '';
-    for (const [key, value] of Object.entries(data)) {
-        if (value && typeof value !== 'object') {
-            const label = key.replace(/_/g, ' ').toUpperCase();
-            fieldsHtml += `
-                <div class="summary-item">
-                    <span class="summary-label">${label}:</span>
-                    <span class="summary-value">${value}</span>
-                </div>`;
-        }
-    }
-
     return `
         <div class="job-summary-card">
-            <h3>📋 Final Job Summary</h3>
-            <div class="summary-list">
-                ${fieldsHtml}
-            </div>
-            <button class="create-job-btn" onclick="createJob()">
+            <h3>Ready to Create Job?</h3>
+            <p>We have collected all the necessary details. Click below to simply create the vacancy.</p>
+            <button class="create-job-btn" onclick='createJob()'>
                 <i class="fas fa-rocket"></i> Create Vacancy Now
             </button>
         </div>
@@ -246,20 +255,25 @@ window.createJob = async function () {
                 'Content-Type': 'application/json',
                 'token': config.token,
                 'programId': config.programId
-            }
+            },
+            body: JSON.stringify({
+                userId: config.userId
+            })
         });
 
         const result = await response.json();
         if (response.ok) {
-            appendMessage('ai', '🎉 **Success!** Your job vacancy has been created successfully.');
-            // Optionally clear history/reset
+            appendMessage('ai', '🎉 **Success!** Your job vacancy has been created successfully!');
+            console.log("VMS Response:", result.vms_response);
+            btn.innerHTML = '<i class="fas fa-check"></i> Job Created';
         } else {
             appendMessage('ai', '❌ **Error:** ' + (result.detail || 'Failed to create job.'));
             btn.innerHTML = '<i class="fas fa-rocket"></i> Create Vacancy Now';
             btn.disabled = false;
         }
     } catch (error) {
-        appendMessage('ai', '🚫 **Connection Error:** Could not reach the creation API.');
+        console.error("Network Error:", error);
+        appendMessage('ai', '🚫 **Connection Error:** Could not reach the API.');
         btn.innerHTML = '<i class="fas fa-rocket"></i> Create Vacancy Now';
         btn.disabled = false;
     }

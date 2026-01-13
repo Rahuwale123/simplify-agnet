@@ -47,7 +47,7 @@ def get_source_types(hierarchy_ids: List[str], labor_category_ids: List[str]) ->
             return "No source types found."
 
         # CACHE THE RESULT
-        cache_tool_result("source_types", source_types)
+        cache_tool_result(source_types)
 
         return json.dumps({"source_types": source_types})
     except Exception as e:

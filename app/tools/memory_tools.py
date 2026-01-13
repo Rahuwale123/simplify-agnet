@@ -1,78 +1,118 @@
-from typing import Optional, Any, Dict
 from langchain.tools import tool
-from pydantic.v1 import BaseModel, Field
+from typing import Dict, List, Optional, Any
 import json
-from app.utils.context import request_session_id
 
-# Global store for job drafts, keyed by session_id/user_id
+# In-memory storage mimicking a database/session cache
 JOB_DRAFTS = {}
-# Global store for the last tool output to prevent ID hallucinations
-SEARCH_CACHE = {}
+SEARCH_CACHE = {} # Stores the last search result to prevent redundant API calls
 
-def get_current_draft():
-    session_id = request_session_id.get() or "default"
-    if session_id not in JOB_DRAFTS:
-        JOB_DRAFTS[session_id] = {}
-    return JOB_DRAFTS[session_id]
-
-def cache_tool_result(result_key: str, data: Any):
-    """Helper for other tools to cache their results."""
-    session_id = request_session_id.get() or "default"
-    if session_id not in SEARCH_CACHE:
-        SEARCH_CACHE[session_id] = {}
-    SEARCH_CACHE[session_id] = {"key": result_key, "data": data}
-
-class SaveFieldInput(BaseModel):
-    field: str = Field(..., description="The field name to save (e.g., 'job_title', 'job_manager_id').")
-    value: Any = Field(..., description="The value to save.")
-
-@tool(args_schema=SaveFieldInput)
+@tool
 def save_field(field: str, value: Any) -> str:
-    """Saves a field to the in-memory job draft dictionary."""
-    draft = get_current_draft()
-    draft[field] = value
-    return json.dumps({"message": f"Saved {field}", "current_draft": draft})
+    """Saves a field to the current job draft. Returns confirmation."""
+    user_id = "default" # Simplified for now
+    if user_id not in JOB_DRAFTS:
+        JOB_DRAFTS[user_id] = {}
+    
+    # Normalize keys to match check_missing_fields expectations
+    if field == "bill_rate_min":
+        field = "min_bill_rate"
+    if field == "bill_rate_max":
+        field = "max_bill_rate"
+        
+    JOB_DRAFTS[user_id][field] = value
+    return json.dumps({
+        "message": f"Saved {field}",
+        "current_draft": JOB_DRAFTS[user_id]
+    })
 
 @tool
-def get_draft() -> str:
-    """Retrieves the current job draft from memory."""
-    draft = get_current_draft()
-    return json.dumps(draft)
+def get_draft() -> dict:
+    """Returns the current complete job draft."""
+    return JOB_DRAFTS.get("default", {})
 
 @tool
-def get_last_search() -> str:
-    """Retrieves the result of the LAST search tool called (e.g. managers, hierarchies).
-    Use this when the user says 'Yes' to find the ID you just discovered.
-    """
-    session_id = request_session_id.get() or "default"
-    result = SEARCH_CACHE.get(session_id, {})
-    return json.dumps(result)
+def get_last_search() -> dict:
+    """Returns the result of the LAST search tool called (Manager, Hierarchy, etc). Use this to auto-select."""
+    return SEARCH_CACHE.get("default", {})
 
-@tool
-def check_missing_fields() -> str:
-    """Checks what fields are missing from the workflow."""
-    draft = get_current_draft()
+def update_search_cache(result: dict):
+    """Helper to update cache (not a tool itself)"""
+    SEARCH_CACHE["default"] = result
+
+# Alias for backward compatibility with other tools
+cache_tool_result = update_search_cache
+
+def _check_missing_fields_logic() -> dict:
+    """Helper function containing the logic for checking missing fields."""
+    draft = JOB_DRAFTS.get("default", {})
+    
+    # 1. Check Job Title
+    if not draft.get("job_title"):
+        return {"status": "IN_PROGRESS", "missing_fields": ["job_title"], "current_draft": draft}
+
+    # 2. Check Job Manager
+    if not draft.get("job_manager_id"):
+        return {"status": "IN_PROGRESS", "missing_fields": ["job_manager_id"], "current_draft": draft}
+    
+    # 3. Check Hierarchy
+    if not draft.get("primary_hierarchy"):
+        return {"status": "IN_PROGRESS", "missing_fields": ["primary_hierarchy"], "current_draft": draft}
+        
+    # 4. Check Job Template & Labor Category (Dependent on Hierarchy)
+    if not draft.get("job_template_id"):
+        return {"status": "IN_PROGRESS", "missing_fields": ["job_template_id"], "current_draft": draft}
+    if not draft.get("labor_category_id"):
+        # Usually selected with template, but good to check
+        return {"status": "IN_PROGRESS", "missing_fields": ["labor_category_id"], "current_draft": draft}
+
+    # 5. Check Source Type (Dependent on Hierarchy & Labor Category)
+    if not draft.get("source_type"):
+        return {"status": "IN_PROGRESS", "missing_fields": ["source_type"], "current_draft": draft}
+
+    # 6. Check Date & Rates details (Requested by User)
     required_order = [
-        "job_title", 
-        "job_manager_id", 
-        "primary_hierarchy", 
-        "job_template_id", 
-        "source_type",
-        "labor_category_id",
-        "start_date",
-        "end_date",
-        "positions",
-        "currency",
-        "unit",
-        "hours_per_day",
-        "days_per_week",
-        "bill_rate_min",
-        "bill_rate_max" 
+         "start_date",
+         "end_date",
+         "positions",
+         "currency",
+         "unit", # Corrected from unit_of_measure via user finding
+         "hours_per_day", # Corrected
+         "days_per_week", # Corrected
+         "min_bill_rate", 
+         "max_bill_rate" 
     ]
     
     missing = [f for f in required_order if f not in draft]
+
+    if missing:
+        return {"status": "IN_PROGRESS", "missing_fields": missing, "current_draft": draft}
+
+    return {"status": "ReADy", "missing_fields": [], "current_draft": draft}
+
+@tool
+def check_missing_fields() -> dict:
+    """
+    Checks the current draft against required fields. 
+    Returns a dict with keys: 'status' (IN_PROGRESS or ReADy), 'missing_fields' (list), and 'current_draft' (dict).
+    """
+    return _check_missing_fields_logic()
+
+@tool
+def submit_job() -> str:
+    """
+    FINAL STEP TOOL.
+    Call this ONLY when `check_missing_fields` returns 'ReADy'.
+    It generates the required JSON signal for the UI to show completion buttons.
+    """
+    # Double check internally
+    check = _check_missing_fields_logic()
+    if check['missing_fields']:
+        return f"Error: Cannot submit. Missing items: {check['missing_fields']}"
+    
+    # Construct the Final UI JSON
+    # The agent will repeat this in the Final Answer
     return json.dumps({
-        "status": "IN_PROGRESS" if missing else "ReADy",
-        "missing_fields": missing,
-        "current_draft": draft
+       "ui_action": "show_completion_buttons",
+       "create_job_now": True,
+       "draft_data": check['current_draft']
     })
