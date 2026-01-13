@@ -1,0 +1,10 @@
+langchain==0.1.16
+langchain-google-genai==1.0.3
+google-generativeai
+python-dotenv
+langchain-experimental==0.0.55
+fastapi
+uvicorn
+pydantic
+pydantic-settings
+requests

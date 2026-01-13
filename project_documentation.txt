@@ -1,0 +1,91 @@
+# Agentic Job Creation AI – Project Documentation
+
+This project is a sophisticated Agentic AI system built with FastAPI, LangChain, and Google Gemini. Its primary purpose is to help users create jobs on the Simplify VMS platform through natural language, maintaining a persistent state and enforcing business rules strictly through code.
+
+---
+
+## 🏗️ Core Architecture
+
+The system follows a **"State-First"** and **"Deterministic Rule"** architecture:
+1. **Frontend**: Logic-free; sends messages and receives instructions/payloads.
+2. **FastAPI**: Manages endpoints, header extraction, and context.
+3. **Agent Orchestrator**: Uses LangChain + Gemini to decide which tool to use.
+4. **SQLite State Store**: Persists every user answer and the overall job draft progress.
+5. **Rules Engine**: A code-based logic layer that determines exactly which fields are missing.
+
+---
+
+## 🚀 API Endpoint Details
+
+**Endpoint:** `POST http://localhost:8000/api/v1/chat`
+
+### Required Headers:
+- `token`: Bearer Authorization token.
+- `programId`: Dynamic program ID for the Simplify API.
+- `Content-Type`: `application/json`
+
+### Request Body (JSON):
+- `message`: The user's natural language input.
+- `userId`: **(Mandatory)** The unique user ID, also used as the `session_id` to maintain job draft state.
+
+### CURL Example:
+```bash
+curl --location 'http://localhost:8000/api/v1/chat' \
+--header 'token: YOUR_BEARER_TOKEN' \
+--header 'programId: 20da23d5-83cb-4dc1-aa4f-9f79840ad966' \
+--header 'Content-Type: application/json' \
+--data '{
+    "message": "Start a new job for RFx Programme",
+    "userId": "user_456"
+}'
+```
+
+---
+
+## 🧰 The Toolset (11 Integrated Tools)
+
+The agent has access to 11 specialized tools, categorized into **Read (Simplify API)** and **Write/State (Local DB)**.
+
+### 📝 State Management Tools (New)
+1. **`save_job_field`**: Persists a specific value (e.g., job_template_id, min_bill_rate) to the user's SQLite draft.
+2. **`load_job_draft`**: Restoration tool that retrieves the current state of the job draft so the agent is always aware of what's already collected.
+3. **`get_missing_required_fields`**: The **Rules Engine**. It analyzes the current draft and returns a list of mandatory fields still needed (e.g., `["work_location", "currency"]`).
+
+### 🔍 Read Tools (Simplify API Integration)
+1. **`get_job_templates`**: Fetches templates filtered by hierarchy.
+2. **`get_parent_hierarchy`**: Fetches the complete program hierarchy.
+3. **`get_job_managers`**: Lists available job managers.
+4. **`get_compliance_checklists`**: Fetches compliance rules based on sourcing model.
+5. **`get_master_data_types`**: Returns IDs for foundational data types (MDTs).
+6. **`get_rate_configurations`**: Fetches complex bill/pay rate rules.
+7. **`get_source_types`**: Checks if "Sourced" or "Payrolled" are valid for the selection.
+8. **`get_custom_fields`**: Retrieves metadata for module-specific custom fields.
+
+---
+
+## ⚙️ Logic & Conversation Flow
+
+The agent operates in a deterministic loop:
+1. **Context Initialization**: `token`, `programId`, and `session_id` (userId) are set in request-scoped variables (`ContextVar`).
+2. **State Check**: The agent uses `load_job_draft` and `get_missing_required_fields` immediately.
+3. **Input Extraction**: If the user provides info (e.g., "Hourly, 100 USD"), the agent extracts all values and saves them using `save_job_field`.
+4. **Validation**: The agent uses Read tools to confirm user choices (e.g., verifying if the provided Job Manager exists).
+5. **Next Step**: The agent asks only **one question at a time** based on the rules engine's "missing fields" list.
+6. **Finalization**: When `missing_fields` is empty, the agent presents a summary and prepares the final payload for the frontend.
+
+---
+
+## 📁 System Structure
+- `app/api/`: FastAPI route handlers (Header/Body extraction).
+- `app/agents/`: Gemini brain configuration and system prompts.
+- `app/tools/`: The logic for all 11 read/write tools.
+- `app/services/`: LangChain orchestration and SQLite DB services.
+- `app/config/`: Database schema, environment settings, and Gemini initialization.
+- `app/utils/`: Request-scoped context management.
+
+---
+
+## 🔐 Security
+- **ContextVars**: Sensitive tokens and session IDs are managed per-request, ensuring absolute isolation between different users.
+- **SQLite Isolation**: Each `userId` has its own persistent row in the `job_drafts` table, preventing data leakage.
+- **SQL Injection Prevention**: Field updates are whitelisted against a list of valid database columns.

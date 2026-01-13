@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simplify AI Agent</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body class="dark-theme">
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="new-chat-btn">
+                <button id="new-chat" type="button"><i class="fas fa-plus"></i> New chat</button>
+            </div>
+
+            <div class="chat-history" id="chat-history">
+                <!-- History items would go here -->
+                <div class="history-item active">
+                    <i class="far fa-message"></i>
+                    <span>Current Job Creation</span>
+                </div>
+            </div>
+
+            <div class="sidebar-footer">
+                <div class="settings-btn" id="open-settings">
+                    <i class="fas fa-cog"></i> Settings
+                </div>
+                <div class="user-profile">
+                    <div class="avatar">S</div>
+                    <span>Simplify User</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Chat Area -->
+        <main class="chat-area">
+            <header class="chat-header">
+                <div class="model-info">
+                    <span>Gemini 1.5 Pro</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+            </header>
+
+            <div class="messages-container" id="messages-container">
+                <div class="welcome-screen" id="welcome-screen">
+                    <h1>Simplify AI Agent</h1>
+                    <p>I can help you create jobs, check compliance, and manage your VMS configurations.</p>
+                    <div class="example-grid">
+                        <div class="example-card" onclick="setInput('Start a new job for RFx Programme')">
+                            "Start a new job for RFx Programme"
+                        </div>
+                        <div class="example-card"
+                            onclick="setInput('Show me the job templates for hierarchy 11be6d7f-22ea-4a7b-9409-8f77501138b9')">
+                            "Show me the job templates..."
+                        </div>
+                        <div class="example-card" onclick="setInput('Fetch the compliance checklists')">
+                            "Fetch the compliance checklists"
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <footer class="input-area">
+                <div class="input-container">
+                    <textarea id="user-input" placeholder="Message Simplify AI..." rows="1"></textarea>
+                    <button id="send-btn" type="button"><i class="fas fa-paper-plane"></i></button>
+                </div>
+                <p class="disclaimer">Simplify AI may provide inaccurate info. Verify important details.</p>
+            </footer>
+        </main>
+    </div>
+
+    <!-- Settings Modal -->
+    <div class="modal-overlay" id="modal-overlay">
+        <div class="settings-modal">
+            <div class="modal-header">
+                <h2>Configuration Settings</h2>
+                <button id="close-settings">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="input-group">
+                    <label>Authorization Token (Bearer)</label>
+                    <input type="text" id="token-input" placeholder="Paste your Bearer token here...">
+                </div>
+                <div class="input-group">
+                    <label>Program ID</label>
+                    <input type="text" id="program-id-input" placeholder="e.g. 20da23d5-83cb-4dc1-aa4f-9f79840ad966">
+                </div>
+                <div class="input-group">
+                    <label>User ID (Session)</label>
+                    <input type="text" id="user-id-input" placeholder="e.g. user_123">
+                </div>
+                <button class="save-btn" id="save-settings">Save Configuration</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
