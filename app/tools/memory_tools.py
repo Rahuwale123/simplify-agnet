@@ -2,14 +2,22 @@ from langchain.tools import tool
 from typing import Dict, List, Optional, Any
 import json
 
+from app.utils.context import request_session_id
+
 # In-memory storage mimicking a database/session cache
 JOB_DRAFTS = {}
 SEARCH_CACHE = {} # Stores the last search result to prevent redundant API calls
 
+def get_current_user_id():
+    """Helper to get the current user ID securely from context."""
+    user_id = request_session_id.get()
+    return user_id if user_id else "default"
+
 @tool
 def save_field(field: str, value: Any) -> str:
     """Saves a field to the current job draft. Returns confirmation."""
-    user_id = "default" # Simplified for now
+    user_id = get_current_user_id()
+    
     if user_id not in JOB_DRAFTS:
         JOB_DRAFTS[user_id] = {}
     
@@ -28,23 +36,27 @@ def save_field(field: str, value: Any) -> str:
 @tool
 def get_draft() -> dict:
     """Returns the current complete job draft."""
-    return JOB_DRAFTS.get("default", {})
+    user_id = get_current_user_id()
+    return JOB_DRAFTS.get(user_id, {})
 
 @tool
 def get_last_search() -> dict:
     """Returns the result of the LAST search tool called (Manager, Hierarchy, etc). Use this to auto-select."""
-    return SEARCH_CACHE.get("default", {})
+    user_id = get_current_user_id()
+    return SEARCH_CACHE.get(user_id, {})
 
 def update_search_cache(result: dict):
     """Helper to update cache (not a tool itself)"""
-    SEARCH_CACHE["default"] = result
+    user_id = get_current_user_id()
+    SEARCH_CACHE[user_id] = result
 
 # Alias for backward compatibility with other tools
 cache_tool_result = update_search_cache
 
 def _check_missing_fields_logic() -> dict:
     """Helper function containing the logic for checking missing fields."""
-    draft = JOB_DRAFTS.get("default", {})
+    user_id = get_current_user_id()
+    draft = JOB_DRAFTS.get(user_id, {})
     
     # 1. Check Job Title
     if not draft.get("job_title"):

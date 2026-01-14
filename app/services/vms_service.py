@@ -146,6 +146,7 @@ def create_job_vms(program_id: str, token: str, job_data: dict):
     }
 
     print(f"Submitting Job Payload to VMS: {json.dumps(payload, indent=2)}")
+    print(f"Using Token (first 50 chars): {token[:50]}...")
 
     response = requests.post(url, headers=headers, json=payload)
     if not response.ok:

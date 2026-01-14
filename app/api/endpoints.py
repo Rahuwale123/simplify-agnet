@@ -82,10 +82,13 @@ async def reset_session(
         if user_id in USER_MEMORIES:
             USER_MEMORIES[user_id].clear()
             
-        # 2. Clear Draft
+        # 2. Clear Draft (In-Memory)
         from app.tools.memory_tools import JOB_DRAFTS
         if user_id in JOB_DRAFTS:
             del JOB_DRAFTS[user_id]
+            
+        # 3. Clear Draft (Database)
+        DBService.clear_draft(user_id)
             
         print(f"Resetting session for User: {user_id}")
         return {"message": "Session reset successfully. Memory and drafts cleared."}
