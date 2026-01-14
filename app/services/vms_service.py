@@ -68,7 +68,7 @@ def create_job_vms(program_id: str, token: str, job_data: dict):
     # Full Payload
     payload = {
         "job_manager_id": job_data.get("job_manager_id"),
-        "managed_by": None,
+        "managed_by": "self-managed",
         "job_type": None,
         "job_template_id": job_data.get("job_template_id"),
         "hierarchy_ids": [job_data.get("primary_hierarchy")],

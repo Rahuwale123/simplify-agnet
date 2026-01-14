@@ -15,24 +15,29 @@
         <!-- Sidebar -->
         <aside class="sidebar">
             <div class="new-chat-btn">
-                <button id="new-chat" type="button"><i class="fas fa-plus"></i> New chat</button>
+                <button id="new-chat" type="button">
+                    <i class="fas fa-plus"></i> New chat
+                </button>
             </div>
 
             <div class="chat-history" id="chat-history">
-                <!-- History items would go here -->
+                <div class="history-label">Today</div>
                 <div class="history-item active">
                     <i class="far fa-message"></i>
-                    <span>Current Job Creation</span>
+                    <span>Job Creation Workflow</span>
                 </div>
             </div>
 
             <div class="sidebar-footer">
-                <div class="settings-btn" id="open-settings">
+                <div class="nav-item" id="open-settings">
                     <i class="fas fa-cog"></i> Settings
                 </div>
                 <div class="user-profile">
-                    <div class="avatar">S</div>
-                    <span>Simplify User</span>
+                    <div class="avatar">U</div>
+                    <div class="user-info">
+                        <div class="name">User</div>
+                        <div class="plan">Free Plan</div>
+                    </div>
                 </div>
             </div>
         </aside>
@@ -40,9 +45,8 @@
         <!-- Main Chat Area -->
         <main class="chat-area">
             <header class="chat-header">
-                <div class="model-info">
-                    <span>Gemini 1.5 Pro</span>
-                    <i class="fas fa-chevron-down"></i>
+                <div class="model-select">
+                    <span>Simplify 4o</span> <i class="fas fa-chevron-down"></i>
                 </div>
             </header>
 

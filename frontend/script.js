@@ -1,8 +1,8 @@
 // Configuration Management - Defaulting to test session details
 let config = {
-    token: "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJMTl81cm1HcHNlUHpOemQ3YzlON0tGbHhYUWlCVE0xdlkzUHpIUlBVLUk0In0.eyJleHAiOjE3NjgzNTc2MTAsImlhdCI6MTc2ODMyMTYxMCwianRpIjoiMmI2YTFkNGItMjBiYS00OWNhLTgwNWItZmVjODRjOTA4MjkzIiwiaXNzIjoiaHR0cHM6Ly92NC1ub25wcm9kLWF1dGguc2ltcGxpZnlzYW5kYm94Lm5ldC9yZWFsbXMvcWEtaGVhbHRoY2FyZSIsImF1ZCI6WyJyZWFsbS1tYW5hZ2VtZW50IiwiYWNjb3VudCJdLCJzdWIiOiIwMTUwNGM3OC1mNTFmLTRiYzYtOTI3Zi03YjcxMmEyNDA0YzAiLCJ0eXAiOiJCZWFyZXIiLCJhenAiOiJzaW1wbGlmeS1hdXRoLXNlcnZpY2UiLCJzaWQiOiIyZWY5MmMyMy1jM2VmLTQzMjktOWRkZS0zYTM0YzQ4OTZkNzciLCJhY3IiOiIxIiwicmVhbG1fYWNjZXNzIjp7InJvbGVzIjpbIm9mZmxpbmVfYWNjZXNzIiwidW1hX2F1dGhvcml6YXRpb24iLCJkZWZhdWx0LXJvbGVzLXFhLWhlYWx0aGNhcmUiXX0sInJlc291cmNlX2FjY2VzcyI6eyJyZWFsbS1tYW5hZ2VtZW50Ijp7InJvbGVzIjpbInZpZXctdXNlcnMiLCJxdWVyeS1ncm91cHMiLCJxdWVyeS11c2VycyJdfSwiYWNjb3VudCI6eyJyb2xlcyI6WyJtYW5hZ2UtYWNjb3VudCIsIm1hbmFnZS1hY2NvdW50LWxpbmtzIiwidmlldy1wcm9maWxlIl19fSwic2NvcGUiOiJzaW1wbGlmeS1hdXRoIGVtYWlsIHByb2ZpbGUiLCJlbWFpbF92ZXJpZmllZCI6ZmFsc2UsInByZWZlcnJlcl91c2VybmFtZSI6InNpZGRodWdhZGFraDU3NitkZXdpZDAxQGdtYWlsLmNvbSIsImNsaWVudF90eXBlIjoiaW50ZXJuYWwiLCJwcmVmZXJyZWRfdXNlcm5hbWUiOiJzaWRkaHVnYWRha2g1NzYrZGV3aWQwMUBnbWFpbC5jb20ifQ.nrv8d4l_L1Cl2rA_p6pifPPdyu1hlOPjKfdVjhS3cA84hYAf26sj3mr8oXMk9HtYLEKk4b9xbg4GU3lkiqKGwPnMcNski_QqElu9KMh0zA_cTY0vQffR675OThgb1vuD9uD_YcuP1AERnPCmQXDAG_BaiZVHaXJoE6YDUpmhW-Ci6_teEiHskRxhJEb7yydXmm5x1KBObvAbKWIX3dLKU8YvpdsqKo19LMNPnwYCU_4vFaN7gyIU8KTWQMMP1goyvhITAcPKeUa12dnQfH-YxN1Qu7OVJTlfxMHWYT8aQZG1FTJJcxzSjHkaKhTncAift7jrvkigRdQomnjhFuic7Q",
-    programId: "388d51a8-6416-4852-83ec-d040b7b11518",
-    userId: "user-456"
+    token: "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJMTl81cm1HcHNlUHpOemQ3YzlON0tGbHhYUWlCVE0xdlkzUHpIUlBVLUk0In0.eyJleHAiOjE3Njg0MDMyODksImlhdCI6MTc2ODM2NzI4OSwianRpIjoiNzY0MjYwNDgtY2YxYi00MjBiLTljNWUtNGQ0ZTBjYTJiNDVlIiwiaXNzIjoiaHR0cHM6Ly92NC1ub25wcm9kLWF1dGguc2ltcGxpZnlzYW5kYm94Lm5ldC9yZWFsbXMvcWEtaGVhbHRoY2FyZSIsImF1ZCI6WyJyZWFsbS1tYW5hZ2VtZW50IiwiYWNjb3VudCJdLCJzdWIiOiIwMTUwNGM3OC1mNTFmLTRiYzYtOTI3Zi03YjcxMmEyNDA0YzAiLCJ0eXAiOiJCZWFyZXIiLCJhenAiOiJzaW1wbGlmeS1hdXRoLXNlcnZpY2UiLCJzaWQiOiIxYzczZDFmZi0yYTI2LTQzODAtYWEzYy1jNjQ4YjQzNDIxZWEiLCJhY3IiOiIxIiwicmVhbG1fYWNjZXNzIjp7InJvbGVzIjpbIm9mZmxpbmVfYWNjZXNzIiwidW1hX2F1dGhvcml6YXRpb24iLCJkZWZhdWx0LXJvbGVzLXFhLWhlYWx0aGNhcmUiXX0sInJlc291cmNlX2FjY2VzcyI6eyJyZWFsbS1tYW5hZ2VtZW50Ijp7InJvbGVzIjpbInZpZXctdXNlcnMiLCJxdWVyeS1ncm91cHMiLCJxdWVyeS11c2VycyJdfSwiYWNjb3VudCI6eyJyb2xlcyI6WyJtYW5hZ2UtYWNjb3VudCIsIm1hbmFnZS1hY2NvdW50LWxpbmtzIiwidmlldy1wcm9maWxlIl19fSwic2NvcGUiOiJzaW1wbGlmeS1hdXRoIGVtYWlsIHByb2ZpbGUiLCJlbWFpbF92ZXJpZmllZCI6ZmFsc2UsInByZWZlcnJlcl91c2VybmFtZSI6InNpZGRodWdhZGFraDU3NitkZXdpZDAxQGdtYWlsLmNvbSIsImNsaWVudF90eXBlIjoiaW50ZXJuYWwiLCJwcmVmZXJyZWRfdXNlcm5hbWUiOiJzaWRkaHVnYWRha2g1NzYrZGV3aWQwMUBnbWFpbC5jb20ifQ.lhg7X4bD3o1EL7o4HeReom6lmLoZDKprOthHpWxRxEqNJ76cKYL43YYl-r_3LI27to7vcdHZ03e0eIccHFIeEzqMfQwsUHA8rTWRW-Q71y93A-CGS0iK-VRPOlrI0uQTq-3kiSuol29h-BtRRnnzEYrt3I1jvjDlcZuBI6iPvUIfH1bXjIZSeQVy8gt_bgBGj_9vazunKYi-Kl5nRjnZ-ifE5bleisNMKPwQ5GPxD7DpyUcsik8Ho2B2BbScWnF_IYDEhztiqHTVcI822SNE9wEf_hYPyjpbTO7RnaYV74vBGucrmgPUIBoDZPxbk-mqBOvaujDww7P67Te1Dn_1Sw",
+    userId: "user-456",
+    programId: "388d51a8-6416-4852-83ec-d040b7b11518"
 };
 
 // UI Elements
@@ -48,6 +48,32 @@ function setInput(text) {
     userInput.dispatchEvent(new Event('input'));
 }
 
+// Status Indicator Helpers
+function updateStatus(text) {
+    let statusEl = document.getElementById('status-indicator');
+    if (!statusEl) {
+        statusEl = document.createElement('div');
+        statusEl.id = 'status-indicator';
+        statusEl.className = 'status-msg';
+        statusEl.innerHTML = `
+            <div class="status-content">
+                <i class="fas fa-circle-notch fa-spin"></i>
+                <span id="status-text">${text}</span>
+            </div>
+        `;
+        messagesContainer.appendChild(statusEl);
+    } else {
+        const textEl = document.getElementById('status-text');
+        if (textEl) textEl.innerText = text;
+    }
+    scrollToBottom();
+}
+
+function clearStatus() {
+    const statusEl = document.getElementById('status-indicator');
+    if (statusEl) statusEl.remove();
+}
+
 async function sendMessage() {
     const text = userInput.value.trim();
     if (!text) return;
@@ -61,8 +87,8 @@ async function sendMessage() {
     // Append User Message
     appendMessage('user', text);
 
-    // Append Typing Indicator
-    const typingId = appendTypingIndicator();
+    // Initial Status
+    updateStatus("Thinking...");
 
     try {
         const response = await fetch('http://localhost:8000/api/v1/chat', {
@@ -78,18 +104,51 @@ async function sendMessage() {
             })
         });
 
-        const data = await response.json();
-        removeElement(typingId);
+        if (!response.ok) {
+            clearStatus();
+            appendMessage('ai', 'Error: Failed to connect to server.');
+            return;
+        }
 
-        if (response.ok) {
-            appendMessage('ai', data.content);
-        } else {
-            appendMessage('ai', 'Error: ' + (data.detail || 'Failed to get response from server. Check your settings and API server status.'));
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let buffer = '';
+
+        while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+
+            buffer += decoder.decode(value, { stream: true });
+
+            // Process complete messages separated by \n\n
+            const lines = buffer.split('\n\n');
+            buffer = lines.pop(); // Keep incomplete chunk
+
+            for (const line of lines) {
+                if (line.startsWith('status:')) {
+                    updateStatus(line.substring(7));
+                } else if (line.startsWith('result:')) {
+                    clearStatus();
+                    appendMessage('ai', line.substring(7));
+                } else if (line.startsWith('error:')) {
+                    clearStatus();
+                    appendMessage('ai', '❌ Error: ' + line.substring(6));
+                }
+                scrollToBottom();
+            }
         }
     } catch (error) {
-        removeElement(typingId);
-        appendMessage('ai', 'Connection Error: Make sure your FastAPI server is running at http://localhost:8000');
+        clearStatus();
+        appendMessage('ai', 'Connection Error: Make sure your FastAPI server is running.');
         console.error(error);
+    } finally {
+        // Ensure status is gone if something broke loops
+    }
+}
+
+function scrollToBottom() {
+    if (messagesContainer) {
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
     }
 }
 
@@ -110,7 +169,7 @@ function appendMessage(role, content) {
     `;
 
     messagesContainer.appendChild(row);
-    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    scrollToBottom();
 }
 
 function appendTypingIndicator() {

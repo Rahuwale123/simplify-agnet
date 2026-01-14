@@ -9,7 +9,9 @@ from app.services.vms_service import create_job_vms
 
 router = APIRouter()
 
-@router.post("/chat", response_model=ChatResponse)
+from fastapi.responses import StreamingResponse
+
+@router.post("/chat")
 async def chat(
     request: ChatRequest,
     token: str = Header(...),
@@ -25,14 +27,15 @@ async def chat(
         request_session_id.set(user_id)
         
         # Initialize session and job draft in database
-        # We use userId as the session_id to maintain state for that user
         DBService.upsert_session(session_id=user_id, user_id=user_id, program_id=programId)
         
-        # You can use token and userId here for logic/authentication
         print(f"Executing request for User: {user_id}, Program: {programId}")
         
-        response = await run_agent(request.message, user_id)
-        return ChatResponse(content=response)
+        # Stream the response
+        return StreamingResponse(
+            run_agent(request.message, user_id),
+            media_type="text/event-stream"
+        )
     except Exception as e:
         print(f"Error in chat endpoint: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
