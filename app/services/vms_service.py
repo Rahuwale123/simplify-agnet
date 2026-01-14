@@ -7,16 +7,34 @@ def create_job_vms(program_id: str, token: str, job_data: dict):
     Creates a job in the VMS system using the provided job_data (draft).
     Constructs the complex payload expected by the VMS API.
     """
+    # Using API_BASE_URL from settings to match other tools (config/v1) or sourcing/v1 if distinct
+    # Attempting to align with the working tools first.
+    # If API_BASE_URL is .../config/v1/api/program, then this becomes .../config/v1/api/program/{id}/job
+    # However, standard might be Sourcing. Let's try to trust the Settings first if "sourcing" failed.
+    # url = f"https://v4-qa.simplifysandbox.net/sourcing/v1/api/program/{program_id}/job"
+    
+    # Actually, let's keep the domain but switch service if needed.
+    # But for now, let's assume the user provided token is good for the base URL used elsewhere.
+    # Using the exact URL provided by the user which aligns with the sourcing service
     url = f"https://v4-qa.simplifysandbox.net/sourcing/v1/api/program/{program_id}/job"
     
-    # Headers
     headers = {
         'accept': 'application/json, text/plain, */*',
         'accept-language': 'en-US,en;q=0.9,hi;q=0.8',
         'authorization': f'Bearer {token}' if token and not token.startswith('Bearer') else token,
+        'cache-control': 'no-cache',
         'content-type': 'application/json',
         'origin': 'https://qa-hiring.simplifysandbox.net',
-        'referer': 'https://qa-hiring.simplifysandbox.net/'
+        'pragma': 'no-cache',
+        'priority': 'u=1, i',
+        'referer': 'https://qa-hiring.simplifysandbox.net/',
+        'sec-ch-ua': '"Google Chrome";v="143", "Chromium";v="143", "Not A(Brand";v="24"',
+        'sec-ch-ua-mobile': '?0',
+        'sec-ch-ua-platform': '"Windows"',
+        'sec-fetch-dest': 'empty',
+        'sec-fetch-mode': 'cors',
+        'sec-fetch-site': 'same-site',
+        'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36'
     }
 
     # Helper to safe convert to float/int
