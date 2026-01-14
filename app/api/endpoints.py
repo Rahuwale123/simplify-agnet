@@ -67,3 +67,30 @@ async def create_job(
     except Exception as e:
         print(f"Error in create_job endpoint: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
+
+@router.post("/reset")
+async def reset_session(
+    request: Dict[str, Any],
+    token: str = Header(...),
+    programId: str = Header(...)
+):
+    try:
+        user_id = request.get("userId")
+        if not user_id:
+            raise HTTPException(status_code=400, detail="UserId is required")
+            
+        # 1. Clear Memory
+        from app.agents.base_agent import USER_MEMORIES
+        if user_id in USER_MEMORIES:
+            USER_MEMORIES[user_id].clear()
+            
+        # 2. Clear Draft
+        from app.tools.memory_tools import JOB_DRAFTS
+        if user_id in JOB_DRAFTS:
+            del JOB_DRAFTS[user_id]
+            
+        print(f"Resetting session for User: {user_id}")
+        return {"message": "Session reset successfully. Memory and drafts cleared."}
+    except Exception as e:
+        print(f"Error in reset endpoint: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))

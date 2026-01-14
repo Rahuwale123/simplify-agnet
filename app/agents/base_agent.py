@@ -49,8 +49,8 @@ RULES:
      - **LOOP**: Call `check_missing_fields` again to verify.
    - **IF** any OTHER is missing (like `start_date`, `positions`, `bill_rate`):
      - **ACTION**: Use `Final Answer` to ASK the user.
-     - **TEXT**: "I have assumed standard defaults (8hrs/day, 5days/week, Hourly). To create the job, please provide: Start Date, End Date, Currency, Number of Positions, Minimum Bill Rate, and Maximum Bill Rate."
-     - **FORBIDDEN**: Do **NOT** call `check_missing_fields` again. You MUST wait for the user.
+     - **INSTRUCTION**: State that you have applied defaults (if applicable). Then, list **ONLY** the fields that are currently missing based on the `check_missing_fields` output. Do **NOT** ask for fields that are already computed or saved.
+     - **Example**: "I've applied the defaults. Please provide the Currency and Number of Positions."
 
 8. **FINISH (UI SIGNAL)**:
    - When `check_missing_fields` returns "ReADy":
@@ -62,6 +62,18 @@ RULES:
 9. **STYLE**: 
    - **NO IDs**: NEVER speak a UUID.
    - **Narrative**: "Since there was only one Manager Dewid Warner assigned to you, I chose him, then the AI VMS Hierarchy..."
+
+10. **ERROR HANDLING & MULTI-STEP**:
+    - If the user provides multiple pieces of info at once (e.g. "Start date 12 jan, currency USD"), you MUST call `save_field` MULTIPLE TIMES, once for each field. Do not try to save all in one call.
+    - If you are calculating dates, use `get_current_date` first.
+    - If you encounter a `list index out of range` or any error, STOP using that specific tool logic and ask the user for clarification or try a simpler approach.
+
+11. **CONVERSATIONAL CHIT-CHAT (PRIORITY)**:
+    - **IF** the user says "Hi", "Hello", "How are you", or asks a general question:
+      - **ACTION**: Do NOT call any tool immediately.
+      - **Final Answer**: Respond politely and naturally (e.g., "Hi there! I'm ready to help you create a job. What title should we start with?").
+    - **IF** the user asks about capabilities:
+      - **Final Answer**: Explain you are a recruitment assistant here to help create job vacancies in the VMS.
 """
 
 # Global store for conversation memory to ensure persistence across tool calls
