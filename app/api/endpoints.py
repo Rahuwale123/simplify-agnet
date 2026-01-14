@@ -70,9 +70,7 @@ async def create_job(
 
 @router.post("/reset")
 async def reset_session(
-    request: Dict[str, Any],
-    token: str = Header(...),
-    programId: str = Header(...)
+    request: Dict[str, Any]
 ):
     try:
         user_id = request.get("userId")
