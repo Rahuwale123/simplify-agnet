@@ -9,3 +9,4 @@ pydantic
 pydantic-settings
 requests
 langchain-community==0.0.34
+langchain-openai==0.1.3

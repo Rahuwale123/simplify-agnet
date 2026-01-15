@@ -85,6 +85,17 @@ async def run_agent(message: str, user_id: str) -> AsyncGenerator[str, None]:
         result = await task
         output = result["output"]
         
+        # CLEANUP: If output is a raw JSON string like '{"action": "Final Answer", "action_input": "..."}', parse it.
+        # This happens because we forced the LLM to speak in JSON, sometimes bypassing the standard parser.
+        import json
+        try:
+            if isinstance(output, str) and output.strip().startswith("{") and "action_input" in output:
+                 parsed = json.loads(output)
+                 if parsed.get("action") == "Final Answer":
+                     output = parsed.get("action_input", output)
+        except:
+             pass
+
         # SAVE TO MEMORY
         add_message(user_id, "user", message)
         add_message(user_id, "ai", output)

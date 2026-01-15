@@ -17,7 +17,7 @@ The system follows a **"State-First"** and **"Deterministic Rule"** architecture
 
 ## 🚀 API Endpoint Details
 
-**Endpoint:** `POST http://localhost:8000/api/v1/chat`
+**Endpoint:** `POST http://13.60.157.40:8000/api/v1/chat`
 
 ### Required Headers:
 - `token`: Bearer Authorization token.
@@ -30,7 +30,7 @@ The system follows a **"State-First"** and **"Deterministic Rule"** architecture
 
 ### CURL Example:
 ```bash
-curl --location 'http://localhost:8000/api/v1/chat' \
+curl --location 'http://13.60.157.40:8000/api/v1/chat' \
 --header 'token: YOUR_BEARER_TOKEN' \
 --header 'programId: 20da23d5-83cb-4dc1-aa4f-9f79840ad966' \
 --header 'Content-Type: application/json' \

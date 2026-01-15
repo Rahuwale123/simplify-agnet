@@ -41,7 +41,7 @@ When the user clicks "Create Vacancy Now", the following sequence is triggered:
     -   The button is disabled to prevent double-submissions.
 
 3.  **API Request**:
-    -   A `POST` request is sent to `http://localhost:8000/api/v1/jobs/create`.
+    -   A `POST` request is sent to `http://13.60.157.40:8000/api/v1/jobs/create`.
     -   **Headers**: 
         -   `token`: The Bearer token from the configuration settings (JWT).
         -   `programId`: The selected Program UUID.

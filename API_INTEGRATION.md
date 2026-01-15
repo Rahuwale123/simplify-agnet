@@ -4,7 +4,7 @@ This guide details how to integrate the frontend with the Simplifi Agent backend
 
 ## Base URL
 ```
-http://localhost:8000/api/v1
+http://13.60.157.40:8000/api/v1
 ```
 
 ## Authentication & Context

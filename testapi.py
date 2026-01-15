@@ -2,7 +2,7 @@ import requests
 import json
 
 def test_chat():
-    url = "http://localhost:8000/api/v1/chat"
+    url = "http://13.60.157.40:8000/api/v1/chat"
     
     # You can provide the token here that you want the tool to use
     headers = {
