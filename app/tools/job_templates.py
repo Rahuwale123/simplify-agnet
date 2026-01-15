@@ -56,7 +56,13 @@ def get_job_templates(hierarchy_id: str, is_enabled: bool = True) -> str:
                 "template_id": template_id,
                 "labour_category_id": labour_category_id,
                 "primary_hierarchy": primary_hierarchy,
-                "checklist_entity_id": checklist_entity_id
+                "checklist_entity_id": checklist_entity_id,
+                # Additional fields for Phase 5 Auto-fill
+                "estimated_hours_per_shift": t.get("estimated_hours_per_shift"),
+                "shifts_per_week": t.get("shifts_per_week"),
+                "description": t.get("description"),
+                "min_bill_rate": t.get("min_bill_rate"),
+                "max_bill_rate": t.get("max_bill_rate")
             })
 
         # CACHE THE RESULT

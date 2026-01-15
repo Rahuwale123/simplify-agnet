@@ -3,60 +3,84 @@ from typing import Dict, List, Optional, Any
 import json
 
 from app.utils.context import request_session_id
+from app.services.db_service import save_job_draft, get_job_draft
 
-# In-memory storage mimicking a database/session cache
-JOB_DRAFTS = {}
-SEARCH_CACHE = {} # Stores the last search result to prevent redundant API calls
+# In-memory cache for search results (can remain ephemeral as it's an optimization)
+SEARCH_CACHE = {} 
 
-def get_current_user_id():
-    """Helper to get the current user ID securely from context."""
-    user_id = request_session_id.get()
-    return user_id if user_id else "default"
+def get_current_session_id():
+    """Helper to get the current session ID securely from context."""
+    return request_session_id.get() or "default_session"
 
 @tool
 def save_field(field: str, value: Any) -> str:
     """Saves a field to the current job draft. Returns confirmation."""
-    user_id = get_current_user_id()
+    session_id = get_current_session_id()
     
-    if user_id not in JOB_DRAFTS:
-        JOB_DRAFTS[user_id] = {}
+    current_draft = get_job_draft(session_id)
     
-    # Normalize keys to match check_missing_fields expectations
-    if field == "bill_rate_min":
-        field = "min_bill_rate"
-    if field == "bill_rate_max":
-        field = "max_bill_rate"
-        
-    JOB_DRAFTS[user_id][field] = value
+    # Normalize keys
+    if field == "bill_rate_min": field = "min_bill_rate"
+    if field == "bill_rate_max": field = "max_bill_rate"
+    
+    # Intelligent Range Parsing for "bill_rate" or "budget"
+    if field in ["bill_rate", "budget", "rate"]:
+        # Check if value is a string with "to" or "-"
+        if isinstance(value, str) and ("to" in value or "-" in value):
+            try:
+                # remove currency symbols
+                clean_val = value.replace("$", "").replace("USD", "").replace("Eur", "").strip()
+                # split
+                if "to" in clean_val:
+                    parts = clean_val.split("to")
+                else:
+                    parts = clean_val.split("-")
+                
+                if len(parts) == 2:
+                    current_draft["min_bill_rate"] = parts[0].strip()
+                    current_draft["max_bill_rate"] = parts[1].strip()
+                    # Also save original just in case
+                    current_draft[field] = value
+                    save_job_draft(session_id, current_draft)
+                    return json.dumps({
+                        "message": f"Saved min/max rates from range '{value}'",
+                        "current_draft": current_draft
+                    })
+            except:
+                pass # Fallback to normal save
+
+    current_draft[field] = value
+    save_job_draft(session_id, current_draft)
+    
     return json.dumps({
         "message": f"Saved {field}",
-        "current_draft": JOB_DRAFTS[user_id]
+        "current_draft": current_draft
     })
 
 @tool
 def get_draft() -> dict:
     """Returns the current complete job draft."""
-    user_id = get_current_user_id()
-    return JOB_DRAFTS.get(user_id, {})
+    session_id = get_current_session_id()
+    return get_job_draft(session_id)
 
 @tool
 def get_last_search() -> dict:
     """Returns the result of the LAST search tool called (Manager, Hierarchy, etc). Use this to auto-select."""
-    user_id = get_current_user_id()
-    return SEARCH_CACHE.get(user_id, {})
+    session_id = get_current_session_id()
+    return SEARCH_CACHE.get(session_id, {})
 
 def update_search_cache(result: dict):
     """Helper to update cache (not a tool itself)"""
-    user_id = get_current_user_id()
-    SEARCH_CACHE[user_id] = result
+    session_id = get_current_session_id()
+    SEARCH_CACHE[session_id] = result
 
 # Alias for backward compatibility with other tools
 cache_tool_result = update_search_cache
 
 def _check_missing_fields_logic() -> dict:
     """Helper function containing the logic for checking missing fields."""
-    user_id = get_current_user_id()
-    draft = JOB_DRAFTS.get(user_id, {})
+    session_id = get_current_session_id()
+    draft = get_job_draft(session_id)
     
     # 1. Check Job Title
     if not draft.get("job_title"):
@@ -87,9 +111,9 @@ def _check_missing_fields_logic() -> dict:
          "end_date",
          "positions",
          "currency",
-         "unit", # Corrected from unit_of_measure via user finding
-         "hours_per_day", # Corrected
-         "days_per_week", # Corrected
+         "unit", 
+         "hours_per_day", 
+         "days_per_week", 
          "min_bill_rate", 
          "max_bill_rate" 
     ]
@@ -128,3 +152,4 @@ def submit_job() -> str:
        "create_job_now": True,
        "draft_data": check['current_draft']
     })
+

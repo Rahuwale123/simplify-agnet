@@ -2,9 +2,8 @@ from fastapi import APIRouter, HTTPException, Header
 from app.schemas.request_schema import ChatRequest, ChatResponse
 from app.services.langchain_service import run_agent
 from app.utils.context import request_token, request_program_id, request_session_id
-from app.services.db_service import DBService
+from app.services.db_service import ensure_session, get_job_draft, save_job_draft, clear_chat_history
 from typing import Optional, Dict, Any
-from app.tools.memory_tools import JOB_DRAFTS
 from app.services.vms_service import create_job_vms
 
 router = APIRouter()
@@ -26,8 +25,8 @@ async def chat(
         request_program_id.set(programId)
         request_session_id.set(user_id)
         
-        # Initialize session and job draft in database
-        DBService.upsert_session(session_id=user_id, user_id=user_id, program_id=programId)
+        # Initialize session in database
+        ensure_session(session_id=user_id, user_id=user_id)
         
         print(f"Executing request for User: {user_id}, Program: {programId}")
         
@@ -51,14 +50,21 @@ async def create_job(
         if not user_id:
             raise HTTPException(status_code=400, detail="UserId is required")
             
-        # Retrieve draft from internal memory
-        # Note: In production, this should come from a DBService, not in-memory global
-        draft = JOB_DRAFTS.get(user_id) or JOB_DRAFTS.get("default")
+        # Retrieve draft from DB
+        draft = get_job_draft(user_id)
         
+        # If empty or not sufficient, we might still try if it allows partials, 
+        # but usually we expect a valid draft.
         if not draft:
-            raise HTTPException(status_code=404, detail="No active job draft found for this user.")
+            # Fallback to defaults or error
+            # For now, let's allow it to attempt if it returns empty but let VMS handle validation
+            pass
+            
+        if not draft:
+             # Try default if user specific failed? No, stick to user.
+             raise HTTPException(status_code=404, detail="No active job draft found for this user.")
 
-        print(f"Creating job for Program: {programId} using Internal Draft")
+        print(f"Creating job for Program: {programId} using Database Draft")
         
         # Call the VMS Service
         result = create_job_vms(programId, token, draft)
@@ -77,21 +83,15 @@ async def reset_session(
         if not user_id:
             raise HTTPException(status_code=400, detail="UserId is required")
             
-        # 1. Clear Memory
-        from app.agents.base_agent import USER_MEMORIES
-        if user_id in USER_MEMORIES:
-            USER_MEMORIES[user_id].clear()
+        # 1. Clear Memory (DB)
+        clear_chat_history(user_id)
             
-        # 2. Clear Draft (In-Memory)
-        from app.tools.memory_tools import JOB_DRAFTS
-        if user_id in JOB_DRAFTS:
-            del JOB_DRAFTS[user_id]
-            
-        # 3. Clear Draft (Database)
-        DBService.clear_draft(user_id)
+        # 2. Clear Draft (DB)
+        save_job_draft(user_id, {})
             
         print(f"Resetting session for User: {user_id}")
         return {"message": "Session reset successfully. Memory and drafts cleared."}
     except Exception as e:
         print(f"Error in reset endpoint: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
+

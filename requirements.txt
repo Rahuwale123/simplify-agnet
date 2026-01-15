@@ -8,3 +8,4 @@ uvicorn
 pydantic
 pydantic-settings
 requests
+langchain-community==0.0.34
