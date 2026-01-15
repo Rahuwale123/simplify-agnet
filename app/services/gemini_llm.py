@@ -4,18 +4,26 @@ from langchain_openai import ChatOpenAI
 from app.config.settings import settings
 from google.generativeai.types import HarmCategory, HarmBlockThreshold
 
+# Singleton Cache
+_cached_llm = None
+
 def get_gemini_llm():
+    global _cached_llm
+    if _cached_llm is not None:
+        return _cached_llm
+
     # Check for direct override
     provider = os.getenv("LLM_PROVIDER", "gemini").lower()
     
     # 1. Direct OpenAI Mode (Instant, no fallback logic needed)
     if provider == "openai":
         print(f"🚀 INITIALIZING LLM: OpenAI (GPT-4o) [PROVIDER={provider}]")
-        return ChatOpenAI(
+        _cached_llm = ChatOpenAI(
             model="gpt-4o",
             api_key=settings.OPENAI_API_KEY,
             temperature=0.7
         )
+        return _cached_llm
 
     print(f"🌍 INITIALIZING LLM: Gemini 2.0 Flash (with OpenAI Fallback) [PROVIDER={provider}]")
     # 2. Gemini Mode (With OpenAI Fallback)
@@ -38,4 +46,5 @@ def get_gemini_llm():
         temperature=0.7
     )
 
-    return gemini_llm.with_fallbacks([openai_llm])
+    _cached_llm = gemini_llm.with_fallbacks([openai_llm])
+    return _cached_llm

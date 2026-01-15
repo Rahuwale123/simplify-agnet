@@ -217,9 +217,57 @@ userInput.onkeydown = (e) => {
 newChatBtn.onclick = (e) => {
     e.preventDefault();
     messagesContainer.innerHTML = '';
-    messagesContainer.appendChild(welcomeScreen);
     welcomeScreen.style.display = 'block';
 };
+
+// --- New Header Action Buttons ---
+const resetSessionBtn = document.getElementById('reset-session-btn');
+const clearChatBtn = document.getElementById('clear-chat-btn');
+
+// Clear Chat (UI Only) - Same as New Chat
+if (clearChatBtn) {
+    clearChatBtn.onclick = newChatBtn.onclick;
+}
+
+// Reset Session (Backend + UI)
+if (resetSessionBtn) {
+    resetSessionBtn.onclick = async (e) => {
+        e.preventDefault();
+
+        // Visual feedback
+        const originalIcon = resetSessionBtn.innerHTML;
+        resetSessionBtn.innerHTML = '<i class="fas fa-spin fa-sync-alt"></i>';
+        resetSessionBtn.disabled = true;
+
+        try {
+            const response = await fetch('http://localhost:8000/api/v1/reset', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    userId: config.userId
+                })
+            });
+
+            if (response.ok) {
+                // Clear UI as well
+                messagesContainer.innerHTML = '';
+                messagesContainer.appendChild(welcomeScreen);
+                welcomeScreen.style.display = 'block';
+                // Optional: Show a toast? For now just reset UI is clear enough.
+            } else {
+                alert("Failed to reset session on server.");
+            }
+        } catch (error) {
+            console.error("Reset Error:", error);
+            alert("Connection error during reset.");
+        } finally {
+            resetSessionBtn.innerHTML = originalIcon;
+            resetSessionBtn.disabled = false;
+        }
+    };
+}
 
 function formatContent(content) {
     if (!content) return '';
