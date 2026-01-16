@@ -25,13 +25,13 @@ def get_gemini_llm():
         )
         return _cached_llm
 
-    print(f"🌍 INITIALIZING LLM: Gemini 2.0 Flash (with OpenAI Fallback) [PROVIDER={provider}]")
-    # 2. Gemini Mode (With OpenAI Fallback)
+    print(f"🌍 INITIALIZING LLM: Gemini 2.0 Flash (NO Fallback) [PROVIDER={provider}]")
+    # 2. Gemini Mode
     gemini_llm = ChatGoogleGenerativeAI(
         model="gemini-2.0-flash",
         google_api_key=settings.GOOGLE_API_KEY,
         temperature=0.7,
-        max_retries=0, # FAIL FAST
+        max_retries=1, # Allow 1 retry? Or 0 to see errors fast.
         safety_settings={
             HarmCategory.HARM_CATEGORY_HARASSMENT: HarmBlockThreshold.BLOCK_NONE,
             HarmCategory.HARM_CATEGORY_HATE_SPEECH: HarmBlockThreshold.BLOCK_NONE,
@@ -40,11 +40,13 @@ def get_gemini_llm():
         }
     )
 
-    openai_llm = ChatOpenAI(
-        model="gpt-4o",
-        api_key=settings.OPENAI_API_KEY,
-        temperature=0.7
-    )
+    # DISABLE OPENAI FALLBACK to avoid 401 errors when key is missing/invalid
+    # openai_llm = ChatOpenAI(
+    #     model="gpt-4o",
+    #     api_key=settings.OPENAI_API_KEY,
+    #     temperature=0.7
+    # )
 
-    _cached_llm = gemini_llm.with_fallbacks([openai_llm])
+    # _cached_llm = gemini_llm.with_fallbacks([openai_llm])
+    _cached_llm = gemini_llm
     return _cached_llm

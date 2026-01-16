@@ -13,47 +13,94 @@ def get_current_session_id():
     return request_session_id.get() or "default_session"
 
 @tool
-def save_field(field: str, value: Any) -> str:
-    """Saves a field to the current job draft. Returns confirmation."""
+def save_field(field: Optional[str] = None, value: Optional[Any] = None, **kwargs) -> str:
+    """
+    Saves a field to the current job draft. 
+    Can be called as:
+    1. save_field(field="job_title", value="Engineer")
+    2. save_field(job_title="Engineer")
+    """
     session_id = get_current_session_id()
-    
     current_draft = get_job_draft(session_id)
     
-    # Normalize keys
-    if field == "bill_rate_min": field = "min_bill_rate"
-    if field == "bill_rate_max": field = "max_bill_rate"
+    # Handle Case 2: Direct kwargs (e.g. {start_date: "2026-01-01"})
+    # Only if field/value are empty, check kwargs
+    changes_made = {}
     
-    # Intelligent Range Parsing for "bill_rate" or "budget"
-    if field in ["bill_rate", "budget", "rate"]:
-        # Check if value is a string with "to" or "-"
-        if isinstance(value, str) and ("to" in value or "-" in value):
-            try:
-                # remove currency symbols
-                clean_val = value.replace("$", "").replace("USD", "").replace("Eur", "").strip()
-                # split
-                if "to" in clean_val:
-                    parts = clean_val.split("to")
-                else:
-                    parts = clean_val.split("-")
-                
-                if len(parts) == 2:
-                    current_draft["min_bill_rate"] = parts[0].strip()
-                    current_draft["max_bill_rate"] = parts[1].strip()
-                    # Also save original just in case
-                    current_draft[field] = value
-                    save_job_draft(session_id, current_draft)
-                    return json.dumps({
-                        "message": f"Saved min/max rates from range '{value}'",
-                        "current_draft": current_draft
-                    })
-            except:
-                pass # Fallback to normal save
+    # Combine kwargs and field/value into a single dict to process
+    data_to_process = kwargs.copy()
+    if field and value is not None:
+        data_to_process[field] = value
+    
+    # Aliases Mapping
+    aliases = {
+        "rate": "min_bill_rate",
+        "hourly_rate": "min_bill_rate",
+        "pay_rate": "min_bill_rate",
+        "bill_rate": "min_bill_rate",
+        "price": "min_bill_rate",
+        "job_manager": "job_manager_id",
+        "manager": "job_manager_id",
+        "location": "work_location", # Assuming work_location is the backend field, or just location
+        "title": "job_title"
+    }
 
-    current_draft[field] = value
+    changes_made = {}
+
+    for k, v in data_to_process.items():
+        # 1. Resolve Key Aliases
+        target_key = aliases.get(k, k)
+        
+        # 2. Special Handling for Rates (Currency Separation)
+        if target_key in ["min_bill_rate", "max_bill_rate"]:
+            # Parse "100 USD", "$100", "100"
+            val_str = str(v).upper().replace("$", "").replace(",", "").strip()
+            
+            # Extract currency if present
+            currency = None
+            if "USD" in val_str: currency = "USD"
+            elif "EUR" in val_str: currency = "EUR"
+            elif "GBP" in val_str: currency = "GBP"
+            elif "INR" in val_str: currency = "INR"
+            elif "CAD" in val_str: currency = "CAD"
+            elif "AUD" in val_str: currency = "AUD"
+            
+            # Clean number
+            clean_num = val_str.replace("USD", "").replace("EUR", "").replace("GBP", "").replace("INR", "").replace("CAD", "").replace("AUD", "").strip()
+            
+            # Identify if range "100-120"
+            if "-" in clean_num:
+                try:
+                    low, high = clean_num.split("-")
+                    current_draft["min_bill_rate"] = low.strip()
+                    current_draft["max_bill_rate"] = high.strip()
+                    changes_made["min_bill_rate"] = low.strip()
+                    changes_made["max_bill_rate"] = high.strip()
+                except:
+                    # Fallback
+                    current_draft[target_key] = clean_num
+                    changes_made[target_key] = clean_num
+            else:
+                current_draft[target_key] = clean_num
+                changes_made[target_key] = clean_num
+            
+            # Save currency if found and not already set
+            if currency:
+                current_draft["currency"] = currency
+                changes_made["currency"] = currency
+                
+        else:
+            # Standard Save
+            current_draft[target_key] = v
+            changes_made[target_key] = v
+
+    if not changes_made:
+        return "Error: No data provided to save. Please provide 'field' and 'value', or key-value pairs."
+
     save_job_draft(session_id, current_draft)
     
     return json.dumps({
-        "message": f"Saved {field}",
+        "message": f"Saved fields: {list(changes_made.keys())}",
         "current_draft": current_draft
     })
 
