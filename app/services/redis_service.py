@@ -25,6 +25,20 @@ class RedisService:
             print(f"Redis Error (get_history): {e}")
             return []
 
+    def get_first_message(self, session_id: str) -> str:
+        """Retrieves only the first message content from history for use as a title."""
+        try:
+            key = f"chat_history:{session_id}"
+            first_msg = self.client.lindex(key, 0)
+            if first_msg:
+                data = json.loads(first_msg)
+                # Try to return first user message if possible, or just first message
+                return data.get("content", "New Chat")
+            return "New Chat"
+        except Exception as e:
+            print(f"Redis Error (get_first_message): {e}")
+            return "New Chat"
+
     def add_message(self, session_id: str, role: str, content: str):
         """Appends a message to the session history."""
         try:

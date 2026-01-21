@@ -114,7 +114,7 @@ function renderSessionList(sessions) {
 
         item.innerHTML = `
             <i class="far fa-message"></i>
-            <span>${session.session_id}</span>
+            <span>${session.title || session.session_id}</span>
             <button class="session-menu-btn" title="Options" onclick="toggleSessionMenu(event, '${session.session_id}')">
                 <i class="fas fa-ellipsis-v"></i>
             </button>

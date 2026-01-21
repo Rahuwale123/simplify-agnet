@@ -40,12 +40,24 @@ class SessionService:
         return new_session_id
 
     def get_user_sessions(self, user_id: str):
-        return (
+        from app.services.redis_service import redis_service
+        sessions = (
             self.db.query(SessionModel)
             .filter(SessionModel.user_id == user_id)
             .order_by(SessionModel.sequence_number)
             .all()
         )
+        
+        # Add title to each session object
+        result = []
+        for s in sessions:
+            title = redis_service.get_first_message(s.session_id)
+            result.append({
+                "session_id": s.session_id,
+                "created_at": s.created_at.isoformat() if s.created_at else None,
+                "title": title
+            })
+        return result
 
     def delete_session(self, session_id: str) -> bool:
         session = (
