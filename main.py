@@ -2,10 +2,10 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.api.endpoints import router as api_router
 from app.config.settings import settings
-from app.config.database import init_db
+from app.config.postgres_db import init_postgres_db
 
-# Initialize database (clears on startup as per latest change)
-init_db()
+
+init_postgres_db()
 
 app = FastAPI(
     title=settings.APP_NAME,

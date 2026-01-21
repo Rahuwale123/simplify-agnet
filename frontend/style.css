@@ -81,23 +81,103 @@ body {
 }
 
 .history-item {
-    padding: 12px;
-    border-radius: 6px;
-    margin: 2px 0;
+    padding: 12px 14px;
+    margin-bottom: 8px;
+    border-radius: 10px;
     cursor: pointer;
+    transition: all 0.2s;
+    color: var(--text-secondary);
     display: flex;
     align-items: center;
     gap: 12px;
-    font-size: 0.9rem;
+    position: relative;
+    /* For absolute positioning of menu */
+}
+
+.history-item:hover {
+    background: var(--bg-hover);
+    color: var(--text-primary);
+}
+
+.history-item.active {
+    background: var(--primary);
+    color: white;
+}
+
+.history-item.active:hover {
+    background: var(--primary-hover);
+}
+
+.history-item i.fa-message {
+    font-size: 14px;
+}
+
+.history-item span {
+    font-size: 14px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    color: var(--text-sidebar);
+    flex-grow: 1;
 }
 
-.history-item:hover,
-.history-item.active {
-    background: var(--hover-sidebar);
+/* Session Menu (Three dots) */
+.session-menu-btn {
+    opacity: 0;
+    transition: opacity 0.2s;
+    padding: 6px;
+    border-radius: 4px;
+    color: inherit;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    margin-right: -4px;
+}
+
+.history-item:hover .session-menu-btn,
+.session-menu-btn.active {
+    opacity: 1;
+}
+
+.session-menu-btn:hover {
+    background: rgba(0, 0, 0, 0.1);
+}
+
+.session-menu-dropdown {
+    position: absolute;
+    right: 10px;
+    top: 35px;
+    background: #202123;
+    /* Sidebar bg */
+    border: 1px solid #4d4d4f;
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    z-index: 100;
+    display: none;
+    min-width: 100px;
+    padding: 4px;
+}
+
+.session-menu-dropdown.show {
+    display: block;
+}
+
+.session-menu-dropdown button {
+    width: 100%;
+    text-align: left;
+    padding: 8px 12px;
+    background: transparent;
+    border: none;
+    color: #ff4d4d;
+    cursor: pointer;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-radius: 4px;
+}
+
+.session-menu-dropdown button:hover {
+    background: #2a2b32;
 }
 
 .nav-item {

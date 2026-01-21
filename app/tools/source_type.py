@@ -5,7 +5,6 @@ from langchain.tools import tool
 from pydantic.v1 import BaseModel, Field
 from app.utils.context import request_token, request_program_id
 from app.config.settings import settings
-from app.tools.memory_tools import cache_tool_result
 
 class GetSourceTypesInput(BaseModel):
     hierarchy_ids: List[str] = Field(..., description="List of hierarchy UUIDs.")

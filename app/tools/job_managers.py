@@ -5,7 +5,6 @@ from langchain.tools import tool
 from pydantic.v1 import BaseModel, Field
 from app.utils.context import request_token, request_program_id
 from app.config.settings import settings
-from app.tools.memory_tools import cache_tool_result
 
 class GetJobManagersInput(BaseModel):
     page: int = Field(1, description="Page number for pagination.")
@@ -50,7 +49,8 @@ def get_job_managers(page: int = 1, limit: int = 25) -> str:
             })
 
         # CACHE THE RESULT for 'get_last_search'
-        cache_tool_result(result)
+        # cache_tool_result(result) # Commented out as undefined. 
+        # Future TODO: Implement shared cache.
 
         return json.dumps({"managers": result})
     except Exception as e:

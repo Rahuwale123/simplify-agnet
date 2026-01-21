@@ -9,9 +9,11 @@ from app.tools.job_managers import get_job_managers
 from app.tools.hierarchy import get_hierarchies
 from app.tools.job_templates import get_job_templates
 from app.tools.source_type import get_source_types
-from app.tools.memory_tools import save_field, get_draft, check_missing_fields, submit_job, get_last_search
-from app.tools.date_tools import get_current_date, resolve_date
-from app.services.db_service import add_chat_message, clear_chat_history
+from app.tools.date_tools import get_current_date
+from app.utils.job_draft_schema import save_field, get_draft, check_missing_fields
+import json
+
+
 from langchain.tools import tool
 
 def render_text_description(tools):
@@ -152,20 +154,70 @@ AI: Recommended worker type: External Consultant (SOW) – Deliverable Based.
 
 *** CRITICAL: MISSING FIELDS ***
 - ALWAYS call `check_missing_fields` after saving a value to see what is next.
-- Do NOT skip fields. Order: Title -> Start -> End -> Location -> Rates.
+- Do NOT skip fields. Order: Title -> Start -> End -> Location -> Rates -> Positions.
 --------------------------------
 TOOL UTILIZATION
 --------------------------------
 - Use `check_missing_fields` to know what fields the backend requires.
-- Use `save_field` to store the user's answers (e.g., job_title, start_date).
+- Use `save_field` to store the user's answers.
+  - **CRITICAL**: usage must be `{{"field_name": "name_of_field", "value": "value_to_save"}}`.
+  - **NEVER** send just a string value. ALWAYS send the dictionary with `field_name` and `value`.
 - Use `submit_job` ONLY after the user explicitly confirms the final summary.
 
 *** CRITICAL: DATES ***
 - If the user says "tomorrow", "next week", "in 2 months", or ANY relative date:
   1. Call `get_current_date` to get today's date.
   2. MENTALLY calculate the target date based on the user's input.
-  3. IMMEDIATELY call `save_field` with the calculated YYYY-MM-DD string.
+  3. IMMEDIATELY call `save_field` with `{{"field_name": "start_date" (or "end_date"), "value": "YYYY-MM-DD"}}`.
+  3. IMMEDIATELY call `save_field` with `{{"field_name": "start_date" (or "end_date"), "value": "YYYY-MM-DD"}}`.
   4. DO NOT ask the user to confirm the date. Just save it.
+  5. **NEVER** output placeholders like "[insert date here]". USE THE TOOL.
+
+*** CRITICAL: NO ESSAYS OR QUESTIONNAIRES ***
+- You are strictly forbidden from asking for "Company Description", "Culture", "Benefits", or "Responsibilities" unless that EXACT field name returned by `check_missing_fields`.
+- The ONLY fields you care about are the ones listed in `job_draft_schema`.
+- **NEVER** ask multiple questions at once.
+- **NEVER** dump a list of questions.
+
+*** CRITICAL: CONFIRMATION GATE (BEFORE Internal IDs) ***
+- You must collect ALL Basic Fields (Title, Start Date, End Date, Location, Rates, Positions) FIRST.
+  - Basic Fields: `job_title`, `start_date`, `end_date`, `location`, `min_rate`, `max_rate`, `rate_range`, `number_of_positions`.
+
+- Once `check_missing_fields` returns ONLY ID fields (manager, hierarchy, etc.), you MUST STOP.
+- SUMMARIZE the Basic Fields to the user.
+- ASK: "Shall I proceed to select the Job Manager and create the job?"
+- **DO NOT** call `get_job_managers` until the user says "Yes".
+
+*** CRITICAL: INTERNAL IDs & SILENT AUTO-SELECTION ***
+- When `check_missing_fields` returns an ID field (manager, hierarchy, template, etc.):
+  1. CALL the corresponding tool field (e.g. `get_job_managers`).
+  2. **IF exactly ONE option is returned**:
+     - IMMEDIATELY call `save_field` with that ID.
+     - **DO NOT** ask the user for confirmation.
+     - Just save it and move to the next missing field.
+  3. **IF multiple options are returned**:
+     - List the NAMES (not IDs) and ask the user to choose.
+
+*** CRITICAL: TEMPLATE EXPANSION ***
+- When a `job_template_id` is selected (either silently or by user):
+  1. You MUST extract `labour_category_id` and `checklist_entity_id` from that template object.
+  2. IMMEDIATELY call `save_field` for `labour_category_id` and `checklist_entity_id` using the values from the template.
+  3. **DO NOT** ask the user for "Labor Category" or "Checklist". Using the template's values is MANDATORY.
+  4. If the template has null values for these, then (and only then) can you ask. But usually, USE THE TEMPLATE.
+
+*** CRITICAL: FINAL CONFIRMATION GATE (Before submit_job) ***
+- You MUST ASK for confirmation TWICE in the flow:
+  1. Initial Gate: After Basic Fields (Title, Rates, etc) are done.
+  2. **FINAL Gate**: After Job Manager, Hierarchy, and Template are selected (and auto-selections are done).
+- BEFORE calling `submit_job`, you MUST:
+  - Summarize the INTERNAL choices (Manager Name, Hierarchy Name, Template Name).
+  - ASK: "I have selected [Manager], [Hierarchy], [Template]. Ready to submit?"
+  - **ONLY** call `submit_job` after the user says "Yes" to this FINAL question.
+  - **DO NOT** mention null/missing IDs (like checklist) to the user. If they are null, just submit as null.
+
+*** TITLE SUGGESTIONS ***
+- If the user explicitly asks for a job title suggestion, you MAY provide 2-3 professional options.
+- Otherwise, ask the user for the title.
 
 --------------------------------
 TOOLS & FORMATTING check
@@ -207,11 +259,34 @@ def clear_user_history(user_id: str):
 def create_agent(user_id: str = "default"):
     llm = get_gemini_llm()
 
+    # Global cache for search results (simplest fix to share state)
+    # Ideally should be in a separate cache service
+    last_search_results = []
+
     @tool
-    def clear_context() -> str:
-        """Clears the conversational buffer memory."""
-        clear_user_history(user_id)
-        return "Context cleared."
+    def get_last_search(query: str = "") -> str:
+        """Returns the results of the last search/list operation (e.g. job managers)."""
+        if not last_search_results:
+            return "No previous search results found."
+        return json.dumps(last_search_results)
+
+    @tool
+    def submit_job(query: str = "") -> str:
+        """Submits the current job draft to the VMS system."""
+        from app.services.vms_service import create_job_vms
+        from app.utils.context import request_token, request_program_id
+        from app.utils.job_draft_schema import get_job_draft
+        
+        try:
+            draft = get_job_draft(user_id)
+            # Basic validation
+            if not draft.get("job_manager_id"):
+                 return "Error: Job Manager is required."
+                 
+            result = create_job_vms(request_program_id.get(), request_token.get(), draft)
+            return f"Job successfully created! VMS Response: {json.dumps(result)}"
+        except Exception as e:
+             return f"Error creating job: {str(e)}"
 
     tools = [
         get_job_managers, 
@@ -223,8 +298,7 @@ def create_agent(user_id: str = "default"):
         check_missing_fields,
         get_last_search,
         get_current_date,
-        submit_job,
-        clear_context
+        submit_job
     ]
 
     # Create Prompt Template

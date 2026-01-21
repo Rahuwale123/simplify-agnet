@@ -5,7 +5,6 @@ from langchain.tools import tool
 from pydantic.v1 import BaseModel, Field
 from app.utils.context import request_token, request_program_id
 from app.config.settings import settings
-from app.tools.memory_tools import cache_tool_result
 
 class GetHierarchiesInput(BaseModel):
     job_manager_id: str = Field(..., description="The UUID of the job manager to filter hierarchies.")
@@ -13,6 +12,12 @@ class GetHierarchiesInput(BaseModel):
 @tool(args_schema=GetHierarchiesInput)
 def get_hierarchies(job_manager_id: str) -> str:
     """Retrieves the list of hierarchies for a specific job manager from the QA environment."""
+    # Robustness: Clean the ID if the agent passed "job_manager_id: <uuid>" string
+    if job_manager_id and isinstance(job_manager_id, str):
+        job_manager_id = job_manager_id.replace("job_manager_id:", "").replace("job_manager_id=", "").strip()
+        # Clean any JSON-like syntax if it crept in incorrectly
+        job_manager_id = job_manager_id.replace("{", "").replace("}", "").replace('"', "").replace("'", "").strip()
+
     token = request_token.get()
     program_id = request_program_id.get()
 
@@ -53,7 +58,7 @@ def get_hierarchies(job_manager_id: str) -> str:
         parse_hierarchies(common_hierarchies)
         
         # CACHE THE RESULT
-        cache_tool_result(result)
+        # cache_tool_result removed as it is not defined
 
         return json.dumps({"hierarchies": result})
     except Exception as e:

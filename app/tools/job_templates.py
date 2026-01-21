@@ -5,7 +5,6 @@ from langchain.tools import tool
 from pydantic.v1 import BaseModel, Field
 from app.utils.context import request_token, request_program_id
 from app.config.settings import settings
-from app.tools.memory_tools import cache_tool_result
 
 class GetJobTemplatesInput(BaseModel):
     hierarchy_id: str = Field(..., description="The UUID of the hierarchy to filter job templates.")
@@ -66,7 +65,7 @@ def get_job_templates(hierarchy_id: str, is_enabled: bool = True) -> str:
             })
 
         # CACHE THE RESULT
-        cache_tool_result(result)
+        # cache result removal
 
         return json.dumps({"templates": result})
     except Exception as e:
