@@ -68,7 +68,6 @@ def get_job_templates(hierarchy_id: str, is_enabled: bool = True, target_templat
 
         # CACHE THE RESULT
         # cache result removal
-<<<<<<< HEAD
 
         if target_template_name:
             target_name_lower = target_template_name.lower().strip()
@@ -76,8 +75,6 @@ def get_job_templates(hierarchy_id: str, is_enabled: bool = True, target_templat
                 if t["template_name"].lower().strip() == target_name_lower:
                     return json.dumps({"template": t, "message": f"Successfully extracted details for {target_template_name}"})
             return f"Template '{target_template_name}' not found in the retrieved list."
-=======
->>>>>>> 8c43841a5f9220c259199e98fc9ddc046e1669f2
 
         return json.dumps({"templates": result})
     except Exception as e:

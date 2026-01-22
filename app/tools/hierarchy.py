@@ -50,7 +50,6 @@ def get_hierarchies(job_manager_id: str) -> str:
         default_h = user.get("default_hierarchy_id", {})
         default_w = user.get("default_work_location_id", {})
 
-<<<<<<< HEAD
         return json.dumps({
             "hierarchie_id": default_h.get("id"),
             "primary_id": default_h.get("id"), # Map primary id same as hierarchy
@@ -61,13 +60,5 @@ def get_hierarchies(job_manager_id: str) -> str:
             "country_name": default_w.get("country_name"),
             "managed_by": f"{user.get('user_type')}-managed" if user.get("user_type") else "self-managed"
         })
-=======
-        parse_hierarchies(common_hierarchies)
-        
-        # CACHE THE RESULT
-        # cache_tool_result removed as it is not defined
-
-        return json.dumps({"hierarchies": result})
->>>>>>> 8c43841a5f9220c259199e98fc9ddc046e1669f2
     except Exception as e:
         return f"Error fetching hierarchies: {str(e)}"

@@ -4,7 +4,6 @@ import json
 
 # Schema definition for fields required to create a job/filter managers
 job_manager_filter_schema = {
-<<<<<<< HEAD
     "job_manager_id": "", 
     "hierarchy_id": "",  # Get default hierarchy id from job manager via api
     "labour_category_id": "", # Job template
@@ -27,18 +26,6 @@ job_manager_filter_schema = {
     "rate_type_id": "", # From rate configuration tool
     "rate_type_name": "", # From rate configuration tool
     "rate_type_abbreviation": "", # From rate configuration tool
-=======
-    "job_manager_id": "",
-    "hierarchy_id": "",
-    "labour_category_id": "",
-    "checklist_entity_id": "",
-    "job_template_id": "",
-    "start_date": "",
-    "end_date": "",
-    "min_rate": "",
-    "max_rate": "",
-    "number_of_positions": "",
->>>>>>> 8c43841a5f9220c259199e98fc9ddc046e1669f2
 }
 
 from app.services.redis_service import redis_service
@@ -73,20 +60,11 @@ job_manager_filter_schema = {
 
 def find_missing_fields(input_data: dict, schema: dict) -> list:
     missing = []
-<<<<<<< HEAD
-=======
-
-    # Updated to allow None values as per user request (for optional IDs from templates)
->>>>>>> 8c43841a5f9220c259199e98fc9ddc046e1669f2
     for field in schema.keys():
         if field not in input_data:
             missing.append(field)
         else:
             value = input_data[field]
-<<<<<<< HEAD
-=======
-            # Only flag as missing if it's an empty STRING. Allow None/Objects.
->>>>>>> 8c43841a5f9220c259199e98fc9ddc046e1669f2
             if isinstance(value, str) and value.strip() == "":
                 missing.append(field)
     return missing
@@ -98,10 +76,6 @@ def save_field(field_name: str, value: Any) -> str:
     if not field_name:
         return "Error: Field name is required"
 
-<<<<<<< HEAD
-=======
-    # Only error on empty strings. Allow None.
->>>>>>> 8c43841a5f9220c259199e98fc9ddc046e1669f2
     if isinstance(value, str) and value.strip() == "":
         return f"Error: Empty value for field: {field_name}"
 
