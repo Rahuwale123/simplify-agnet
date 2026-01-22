@@ -50,17 +50,24 @@ def create_job_vms(program_id: str, token: str, job_data: dict):
         except ValueError:
             return 0
 
+    def safe_bool(val):
+        if isinstance(val, bool):
+            return val
+        if isinstance(val, str):
+            return val.lower() == "true"
+        return False
+
     # Rate Model Construction
     rate_model = {
-        "name": "Rate Config for Standard ",
-        "hierarchies": [{"id": job_data.get("primary_hierarchy"), "name": "AI VMS Program"}], # Name is hardcoded/assumed or needs fetch
+        "name": "Rate Config",
+        "hierarchies": [{"id": job_data.get("hierarchie_id") or job_data.get("hierarchy_id"), "name": job_data.get("hierarchy_name")}],
         "is_shift_rate": False,
         "rate_configuration": [{
             "base_rate": {
                 "rate_type": {
-                    "id": "d1b7aabd-8b02-416c-b162-162c76f327f6", # Hardcoded standard rate ID
-                    "name": "Standard Rate",
-                    "abbreviation": "ST",
+                    "id": job_data.get("rate_type_id") or "d1b7aabd-8b02-416c-b162-162c76f327f6",
+                    "name": job_data.get("rate_type_name") or "Standard Rate",
+                    "abbreviation": job_data.get("rate_type_abbreviation") or "ST",
                     "rate_type_category": {
                         "id": "677ad919-65a3-4e3e-b5b3-802f68a03d9a",
                         "value": "standard",
@@ -68,8 +75,8 @@ def create_job_vms(program_id: str, token: str, job_data: dict):
                     },
                     "is_base_rate": True,
                     "shift_type": None,
-                    "min_rate": {"amount": safe_float(job_data.get("min_bill_rate") or job_data.get("bill_rate_min")), "is_changeable": True, "is_reduceable": False},
-                    "max_rate": {"amount": safe_float(job_data.get("max_bill_rate") or job_data.get("bill_rate_max")), "is_changeable": True, "is_reduceable": False},
+                    "min_rate": {"amount": safe_float(job_data.get("min_rate")), "is_changeable": True, "is_reduceable": False},
+                    "max_rate": {"amount": safe_float(job_data.get("max_rate")), "is_changeable": True, "is_reduceable": False},
                     "min_max_rate": {"max_rate": "0.00000000", "min_rate": "0.00000000"},
                     "is_enabled": True
                 },
@@ -86,9 +93,19 @@ def create_job_vms(program_id: str, token: str, job_data: dict):
     # Full Payload
     payload = {
         "job_manager_id": job_data.get("job_manager_id"),
-        "managed_by": "self-managed",
+        "managed_by": job_data.get("managed_by") or "self-managed",
         "job_type": None,
         "job_template_id": job_data.get("job_template_id"),
+<<<<<<< HEAD
+        "hierarchy_ids": [job_data.get("hierarchie_id") or job_data.get("hierarchy_id")], # Corrected mapping
+        "primary_hierarchy": job_data.get("primary_id") or job_data.get("hierarchie_id") or job_data.get("hierarchy_id"), # Corrected mapping
+        "checklist_entity_id": job_data.get("checklist_entity_id"), # Corrected
+        "checklist_version": job_data.get("checklist_version"), # Use from template/draft
+        "work_location_id": job_data.get("work_location_id"), # Use from draft
+        "labor_category_id": job_data.get("labour_category_id"), # Corrected spelling logic
+        "work_location": {
+            "id": job_data.get("work_location_id"), # Use from draft
+=======
         "hierarchy_ids": [job_data.get("hierarchy_id")], # Corrected mapping
         "primary_hierarchy": job_data.get("hierarchy_id"), # Corrected mapping
         "checklist_entity_id": job_data.get("checklist_entity_id"), # Corrected
@@ -97,6 +114,7 @@ def create_job_vms(program_id: str, token: str, job_data: dict):
         "labor_category_id": job_data.get("labour_category_id"), # Corrected spelling logic
         "work_location": {
             "id": None, 
+>>>>>>> 8c43841a5f9220c259199e98fc9ddc046e1669f2
             "name": job_data.get("location"), # Map location name
             "code": None, 
             "city_name": job_data.get("location"), # Use location as city fallback
@@ -106,7 +124,12 @@ def create_job_vms(program_id: str, token: str, job_data: dict):
             "address_line_2": None, 
             "state_name": None
         },
+<<<<<<< HEAD
+        "title": job_data.get("job_title"), # Explicitly set title
+        "description": job_data.get("job_description") or job_data.get("job_title"), # Fallback to title if no template desc
+=======
         "description": job_data.get("job_title"), # Fallback description to Title if missing
+>>>>>>> 8c43841a5f9220c259199e98fc9ddc046e1669f2
         "additional_attachments": [],
         "qualifications": [],
         "description_url": None,
@@ -118,6 +141,16 @@ def create_job_vms(program_id: str, token: str, job_data: dict):
         "is_shift_type": False,
         "start_date": start_date,
         "end_date": end_date,
+<<<<<<< HEAD
+        "no_positions":1, # Use valid int or default 1
+        "expense_allowed": "YES",
+        "currency": job_data.get("currency") or "USD", # Use from draft or default USD
+        "unit_of_measure": "Hourly", # Default to Hourly as unit fields were removed
+        "min_bill_rate": safe_float(job_data.get("min_rate")), # Corrected key
+        "max_bill_rate": safe_float(job_data.get("max_rate")), # Corrected key
+        "estimated_hours_per_shift": safe_float(job_data.get("estimated_hours_per_shift")),
+        "shifts_per_week": safe_float(job_data.get("shifts_per_week")),
+=======
         "no_positions": safe_int(job_data.get("number_of_positions")) or 1, # Use valid int or default 1
         "expense_allowed": None,
         "currency": "USD", # Hardcoded USD as per request/default
@@ -126,6 +159,7 @@ def create_job_vms(program_id: str, token: str, job_data: dict):
         "max_bill_rate": safe_float(job_data.get("max_rate")), # Corrected key
         "estimated_hours_per_shift": 8.0, # Defaulting to logical standard
         "shifts_per_week": 5.0, # Defaulting to logical standard
+>>>>>>> 8c43841a5f9220c259199e98fc9ddc046e1669f2
         "shift": None,
         "differential_on": "",
         "differential_value": "",
@@ -142,8 +176,13 @@ def create_job_vms(program_id: str, token: str, job_data: dict):
         },
         "net_budget": "0.00000000",
         "expenses": [],
+<<<<<<< HEAD
+        "ot_exempt": safe_bool(job_data.get("ot_exempt")),
+        "candidate_source": "Sourced", # Default source
+=======
         "ot_exempt": False,
         "candidate_source": "Vendor", # Default source
+>>>>>>> 8c43841a5f9220c259199e98fc9ddc046e1669f2
         "rates": [],
         "status": "DRAFT", # Trying OPEN instead of DRAFT if desired, or keep DRAFT
         "source": "TEMPLATE",

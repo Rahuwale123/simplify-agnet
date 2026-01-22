@@ -9,10 +9,11 @@ from app.config.settings import settings
 class GetJobTemplatesInput(BaseModel):
     hierarchy_id: str = Field(..., description="The UUID of the hierarchy to filter job templates.")
     is_enabled: bool = Field(True, description="Filter for enabled templates.")
+    target_template_name: Optional[str] = Field(None, description="If provided, returns details ONLY for this specific template name.")
 
 @tool(args_schema=GetJobTemplatesInput)
-def get_job_templates(hierarchy_id: str, is_enabled: bool = True) -> str:
-    """Retrieves the list of job templates for a specific hierarchy from the QA environment."""
+def get_job_templates(hierarchy_id: str, is_enabled: bool = True, target_template_name: Optional[str] = None) -> str:
+    """Retrieves job templates. Use without target_template_name for a list, or with it for a specific template's details."""
     token = request_token.get()
     program_id = request_program_id.get()
 
@@ -60,12 +61,23 @@ def get_job_templates(hierarchy_id: str, is_enabled: bool = True) -> str:
                 "estimated_hours_per_shift": t.get("estimated_hours_per_shift"),
                 "shifts_per_week": t.get("shifts_per_week"),
                 "description": t.get("description"),
-                "min_bill_rate": t.get("min_bill_rate"),
-                "max_bill_rate": t.get("max_bill_rate")
+                "checklist_version": t.get("checklist_version"),
+                # "min_bill_rate": t.get("min_bill_rate"),
+                # "max_bill_rate": t.get("max_bill_rate")
             })
 
         # CACHE THE RESULT
         # cache result removal
+<<<<<<< HEAD
+
+        if target_template_name:
+            target_name_lower = target_template_name.lower().strip()
+            for t in result:
+                if t["template_name"].lower().strip() == target_name_lower:
+                    return json.dumps({"template": t, "message": f"Successfully extracted details for {target_template_name}"})
+            return f"Template '{target_template_name}' not found in the retrieved list."
+=======
+>>>>>>> 8c43841a5f9220c259199e98fc9ddc046e1669f2
 
         return json.dumps({"templates": result})
     except Exception as e:

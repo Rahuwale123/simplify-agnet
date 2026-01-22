@@ -56,5 +56,31 @@ class RedisService:
         except Exception as e:
             print(f"Redis Error (clear_history): {e}")
 
+    def save_draft(self, session_id: str, data: dict):
+        """Saves the job draft for a session."""
+        try:
+            key = f"job_draft:{session_id}"
+            self.client.set(key, json.dumps(data))
+        except Exception as e:
+            print(f"Redis Error (save_draft): {e}")
+
+    def get_draft(self, session_id: str) -> dict:
+        """Retrieves the job draft for a session."""
+        try:
+            key = f"job_draft:{session_id}"
+            data = self.client.get(key)
+            return json.loads(data) if data else {}
+        except Exception as e:
+            print(f"Redis Error (get_draft): {e}")
+            return {}
+
+    def clear_draft(self, session_id: str):
+        """Clears the job draft for a session."""
+        try:
+            key = f"job_draft:{session_id}"
+            self.client.delete(key)
+        except Exception as e:
+            print(f"Redis Error (clear_draft): {e}")
+
 # Singleton instance
 redis_service = RedisService()

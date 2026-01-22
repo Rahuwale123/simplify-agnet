@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException, Header, Depends
 from sqlalchemy.orm import Session
 from app.schemas.request_schema import ChatRequest, ChatResponse, StartChatRequest
 from app.services.langchain_service import run_agent
-from app.utils.context import request_token, request_program_id, request_session_id
+from app.utils.context import request_token, request_program_id, request_session_id, request_user_id
 from app.config.postgres_db import get_session
 from app.services.session_service import SessionService, ensure_session
 from app.services.redis_service import redis_service
@@ -30,6 +30,7 @@ async def chat(
         request_token.set(token)
         request_program_id.set(programId)
         request_session_id.set(session_id)
+        request_user_id.set(user_id)
         
         # Initialize session in database (ensure_session might need updates, but user only asked for payload change here. 
         # Ideally, we should ensure the session actually exists or log it.)
@@ -49,21 +50,21 @@ async def chat(
 
 
 class ResetRequest(BaseModel):
-    userId: str
+    sessionId: str
 
 @router.post("/reset")
 async def reset_session(request: ResetRequest):
     try:
-        user_id = request.userId
+        session_id = request.sessionId
         
-        # 1. Clear Memory (Redis)
-        redis_service.clear_history(user_id)
+        # 1. Clear Memory (Redis History)
+        redis_service.clear_history(session_id)
             
-        # 2. Clear Draft (DB)
-        save_job_draft(user_id, {})
+        # 2. Clear Draft (Redis Draft)
+        redis_service.clear_draft(session_id)
             
-        print(f"Resetting session for User: {user_id}")
-        return {"message": "Session reset successfully. Memory and drafts cleared."}
+        print(f"Resetting session history and draft for Session: {session_id}")
+        return {"message": f"Session {session_id} reset successfully. Memory and drafts cleared."}
     except Exception as e:
         print(f"Error in reset endpoint: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))

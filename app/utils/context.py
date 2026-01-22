@@ -4,3 +4,4 @@ from contextvars import ContextVar
 request_token: ContextVar[str] = ContextVar("request_token", default="")
 request_program_id: ContextVar[str] = ContextVar("request_program_id", default="")
 request_session_id: ContextVar[str] = ContextVar("request_session_id", default="")
+request_user_id: ContextVar[str] = ContextVar("request_user_id", default="")

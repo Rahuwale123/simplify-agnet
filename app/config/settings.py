@@ -12,6 +12,7 @@ class Settings(BaseSettings):
     # Gemini Settings
     GOOGLE_API_KEY: str = os.getenv("GOOGLE_API_KEY", "")
     API_BASE_URL: str = os.getenv("API_BASE_URL", "https://v4-qa.simplifysandbox.net/config/v1/api/program")
+    SOW_BASE_URL: str = os.getenv("SOW_BASE_URL", "https://v4-qa.simplifysandbox.net/sow/v1/api/program")
 
     # Server Settings
     PORT: int = int(os.getenv("PORT", 8000))
